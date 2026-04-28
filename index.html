@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!--
+╔══════════════════════════════════════════════════════════════════════╗
+║   COZINHA MÁGICA DAS LETRAS v4 — Lara Melissa                        ║
+║   Login protegido + Supabase + GitHub Pages                          ║
+║   Pai Winison: siga o guia abaixo para configurar tudo 💛            ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  PASSO 1 — SUPABASE (salvar progresso na nuvem)                      ║
+║  a) Acesse supabase.com → New project (dê um nome, ex: cozinha-lara) ║
+║  b) Vá em "SQL Editor" → "New query" → cole e execute este SQL:      ║
+║                                                                      ║
+║  CREATE TABLE progresso (                                            ║
+║    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,                    ║
+║    usuario text UNIQUE NOT NULL,                                     ║
+║    fase_atual integer DEFAULT 1,                                     ║
+║    xp_total integer DEFAULT 0,                                       ║
+║    sequencia_dias integer DEFAULT 0,                                 ║
+║    ultima_atividade text,                                            ║
+║    missoes_concluidas integer DEFAULT 0,                             ║
+║    marcos_desbloqueados integer[] DEFAULT '{}',                      ║
+║    sessoes_hoje jsonb DEFAULT '{"feitas":[false,false,false],"rotacao":0}', ║
+║    criado_em timestamp DEFAULT now()                                 ║
+║  );                                                                  ║
+║                                                                      ║
+║  -- Permitir leitura e escrita sem autenticação (RLS desabilitado):  ║
+║  ALTER TABLE progresso DISABLE ROW LEVEL SECURITY;                   ║
+║                                                                      ║
+║  c) Vá em Project Settings → API                                     ║
+║     Copie "Project URL" → cole em SUPABASE_URL abaixo               ║
+║     Copie "anon public" key → cole em SUPABASE_KEY abaixo            ║
+║                                                                      ║
+║  PASSO 2 — CONFIGURE ESTE ARQUIVO                                    ║
+║  Abra este arquivo num editor de texto (ex: Notepad, VS Code)        ║
+║  Encontre as linhas abaixo e cole seus valores:                      ║
+║    const SUPABASE_URL = 'COLE_SUA_URL_AQUI';                         ║
+║    const SUPABASE_KEY = 'COLE_SUA_CHAVE_AQUI';                       ║
+║                                                                      ║
+║  PASSO 3 — GITHUB PAGES (publicar online grátis)                     ║
+║  a) github.com → New repository → nome: cozinha-magica-lara          ║
+║     Marque "Public" → Create repository                              ║
+║  b) Add file → Upload files → arraste este index.html → Commit       ║
+║  c) Settings → Pages → Source: Deploy from branch                    ║
+║     Branch: main → Save                                              ║
+║  d) Aguarde ~2 min → o link aparece no topo (Settings → Pages)       ║
+║     Ex: https://seuusuario.github.io/cozinha-magica-lara             ║
+║                                                                      ║
+║  LOGIN DA LARA:  usuário: lara   senha: melissa                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>🍳 Cozinha Mágica das Letras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ──────────────────────────────────────── */
+:root {
+  --bg:#FFFBF0; --laranja:#FF8C00; --laranja2:#FFB347;
+  --verde:#4CAF82; --rosa:#FF6B9D; --azul:#5BBDE4;
+  --marrom:#5C3D1E; --amarelo:#FFD700; --cinza:#F0E8D8;
+  --s1:0 4px 18px rgba(92,61,30,.13);
+  --s2:0 8px 28px rgba(92,61,30,.22);
+  --r:20px; --rs:12px;
+  /* Tipografia fluida — escala entre 320px e 768px+ */
+  --f-sm:clamp(11px,2.8vw,14px);
+  --f-md:clamp(14px,3.5vw,17px);
+  --f-lg:clamp(17px,4.2vw,22px);
+  --f-xl:clamp(22px,5.5vw,32px);
+  --f-icon:clamp(28px,7vw,42px);
+  /* Nav segura para iPhone com home indicator */
+  --safe-b:env(safe-area-inset-bottom, 0px);
+  --nav-h:calc(60px + var(--safe-b));
+}
+
+/* ─── RESET ───────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--marrom);
+     font-size:var(--f-md);overscroll-behavior:none}
+
+/* ─── TELAS ───────────────────────────────────────── */
+.tela{display:none;min-height:100dvh;flex-direction:column;animation:fadeIn .3s ease}
+.tela.ativa{display:flex}
+
+/* ─── ANIMAÇÕES ───────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px var(--amarelo)}50%{box-shadow:0 0 22px var(--amarelo),0 0 44px var(--laranja)}}
+@keyframes confettiDrop{0%{transform:translateY(-60px) rotate(0);opacity:1}100%{transform:translateY(100dvh) rotate(500deg);opacity:0}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+
+/* ─── AVISO OFFLINE ───────────────────────────────── */
+#aviso-offline{background:linear-gradient(135deg,var(--azul),#2980B9);color:#fff;
+  text-align:center;padding:8px;font-size:var(--f-sm);font-weight:700;display:none}
+
+/* ═══════════════════════════════════════════════════
+   TELA 1 — SPLASH
+═══════════════════════════════════════════════════ */
+#tela-splash{background:linear-gradient(135deg,#FF8C00,#FFD700 45%,#FF6B9D);
+  align-items:center;justify-content:center;position:relative;overflow:hidden}
+.splash-bolha{position:absolute;border-radius:50%;background:rgba(255,255,255,.13);animation:float 3s ease-in-out infinite}
+.splash-bolha:nth-child(1){width:clamp(50px,15vw,90px);height:clamp(50px,15vw,90px);top:8%;left:4%}
+.splash-bolha:nth-child(2){width:clamp(34px,9vw,55px);height:clamp(34px,9vw,55px);top:18%;right:8%;animation-delay:.5s}
+.splash-bolha:nth-child(3){width:clamp(70px,18vw,130px);height:clamp(70px,18vw,130px);bottom:12%;left:6%;animation-delay:1s}
+.splash-bolha:nth-child(4){width:clamp(40px,11vw,70px);height:clamp(40px,11vw,70px);bottom:22%;right:4%;animation-delay:1.5s}
+.splash-content{text-align:center;z-index:1;padding:clamp(20px,5vw,40px) 20px;width:100%;max-width:440px}
+.splash-logo{font-size:clamp(64px,18vw,100px);display:block;animation:float 2.5s ease-in-out infinite;margin-bottom:6px;line-height:1.1}
+.splash-titulo{font-size:var(--f-xl);font-weight:900;color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.2);line-height:1.2;margin-bottom:5px}
+.splash-sub{font-size:var(--f-md);color:rgba(255,255,255,.9);font-weight:700;margin-bottom:clamp(16px,4vw,28px)}
+.splash-nome{background:#fff;color:var(--laranja);font-size:var(--f-lg);font-weight:900;
+  padding:clamp(8px,2.5vw,13px) clamp(20px,6vw,38px);border-radius:100px;
+  box-shadow:var(--s2);margin-bottom:clamp(18px,5vw,30px);display:inline-block;animation:pulse 2s ease-in-out infinite}
+.btn-entrar{background:#fff;color:var(--laranja);font-family:'Nunito',sans-serif;
+  font-size:var(--f-lg);font-weight:900;border:none;border-radius:100px;
+  padding:clamp(14px,3.5vw,18px) clamp(28px,7vw,46px);cursor:pointer;
+  box-shadow:0 6px 0 rgba(0,0,0,.12),var(--s2);transition:transform .1s,box-shadow .1s;
+  animation:bounce 2s ease-in-out infinite;min-height:56px}
+.btn-entrar:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.12)}
+
+/* ═══════════════════════════════════════════════════
+   TELA 2 — HOME
+═══════════════════════════════════════════════════ */
+#tela-home{background:var(--bg)}
+.home-header{background:linear-gradient(135deg,var(--laranja),var(--laranja2));
+  padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,20px) clamp(20px,4.5vw,28px);
+  border-radius:0 0 26px 26px;color:#fff;position:relative;overflow:hidden}
+.home-header::before{content:'';position:absolute;top:-24px;right:-24px;
+  width:130px;height:130px;background:rgba(255,255,255,.08);border-radius:50%}
+.htop{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+.lara-av{width:clamp(52px,13vw,66px);height:clamp(52px,13vw,66px);border-radius:50%;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(26px,7vw,36px);box-shadow:0 3px 12px rgba(0,0,0,.18);
+  border:3px solid var(--amarelo);animation:wiggle 4s ease-in-out infinite;
+  cursor:pointer;flex-shrink:0}
+.hinfo{flex:1;min-width:0}
+.hola{font-size:var(--f-sm);font-weight:600;opacity:.9}
+.hnome{font-size:var(--f-lg);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hchapeu{font-size:var(--f-sm);font-weight:700;opacity:.85;margin-top:1px}
+.streak-b{background:rgba(255,255,255,.2);border-radius:var(--rs);
+  padding:clamp(7px,2vw,10px) clamp(10px,2.5vw,14px);text-align:center;cursor:pointer;flex-shrink:0}
+.sfogo{font-size:clamp(20px,5.5vw,26px);animation:bounce 1.5s ease-in-out infinite;line-height:1.2}
+.snum{font-size:clamp(14px,3.5vw,18px);font-weight:900}
+.slabel{font-size:clamp(9px,2.3vw,11px);font-weight:700;opacity:.9}
+.xp-label{display:flex;justify-content:space-between;font-size:var(--f-sm);font-weight:700;margin-bottom:5px;opacity:.95}
+.xp-bg{background:rgba(0,0,0,.18);border-radius:100px;height:14px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--amarelo),#FFF176);border-radius:100px;
+  transition:width .8s cubic-bezier(.34,1.56,.64,1);position:relative}
+.xp-fill::after{content:'⭐';position:absolute;right:-2px;top:50%;transform:translateY(-50%);font-size:15px}
+
+.hbody{padding:clamp(14px,3.5vw,20px);padding-bottom:calc(var(--nav-h) + 16px);flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.stitle{font-size:var(--f-lg);font-weight:900;color:var(--marrom);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+
+/* Receitas do dia */
+.rec-card{background:#fff;border-radius:var(--r);padding:clamp(14px,3.5vw,18px);
+  box-shadow:var(--s1);margin-bottom:20px;border:3px solid var(--laranja2)}
+.miss-item{display:flex;align-items:center;gap:clamp(10px,2.5vw,13px);
+  padding:clamp(10px,2.5vw,13px) 0;border-bottom:2px dashed var(--cinza);
+  cursor:pointer;transition:transform .15s;-webkit-user-select:none;user-select:none}
+.miss-item:last-child{border-bottom:none;padding-bottom:0}
+.miss-item:first-child{padding-top:0}
+.miss-item:active{transform:scale(.98)}
+.miss-item.concluida{opacity:.55}
+.miss-ic{width:clamp(44px,11vw,54px);height:clamp(44px,11vw,54px);border-radius:var(--rs);
+  display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5vw,26px);flex-shrink:0}
+.miss-ic.aq{background:linear-gradient(135deg,#FFE0B2,#FFCC02)}
+.miss-ic.pr{background:linear-gradient(135deg,#C8E6C9,#4CAF82)}
+.miss-ic.fx{background:linear-gradient(135deg,#E1BEE7,#9B59B6)}
+.miss-info{flex:1;min-width:0}
+.miss-nome{font-size:var(--f-md);font-weight:800}
+.miss-desc{font-size:var(--f-sm);color:#999;font-weight:600}
+.miss-xp{font-size:var(--f-sm);font-weight:800;color:var(--laranja);margin-top:1px}
+.miss-check{width:clamp(30px,7.5vw,36px);height:clamp(30px,7.5vw,36px);border-radius:50%;
+  border:3px solid #DDD;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(13px,3.5vw,17px);flex-shrink:0;background:#fff;transition:all .3s}
+.miss-check.ok{background:var(--verde);border-color:var(--verde);color:#fff}
+
+/* Fases */
+.fases-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(8px,2vw,12px);margin-bottom:20px}
+.fase-card{background:#fff;border-radius:var(--r);padding:clamp(12px,3vw,16px) clamp(8px,2.5vw,12px);
+  text-align:center;box-shadow:var(--s1);cursor:pointer;transition:transform .15s;
+  border:3px solid transparent;position:relative;overflow:hidden}
+.fase-card:active{transform:scale(.97)}
+.fase-card.atual{border-color:var(--laranja);animation:glow 2s ease-in-out infinite}
+.fase-card.ok{border-color:var(--verde)}
+.fase-card.lock{opacity:.45;cursor:not-allowed}
+.fase-ic{font-size:clamp(28px,7.5vw,38px);margin-bottom:4px}
+.fase-num{font-size:clamp(9px,2.2vw,11px);font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px}
+.fase-nome{font-size:clamp(12px,3vw,15px);font-weight:800;margin-top:2px}
+.fase-st{position:absolute;top:8px;right:8px;font-size:clamp(13px,3.2vw,16px)}
+.fase-prog{font-size:clamp(9px,2.2vw,11px);color:var(--verde);font-weight:700;margin-top:3px}
+
+/* Personagens */
+.pers-row{display:flex;gap:clamp(8px,2.5vw,12px);overflow-x:auto;
+  padding-bottom:8px;margin-bottom:20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.pers-row::-webkit-scrollbar{display:none}
+.pers-mini{flex-shrink:0;text-align:center}
+.pers-av{width:clamp(48px,12vw,62px);height:clamp(48px,12vw,62px);border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:clamp(24px,6.5vw,32px);
+  box-shadow:var(--s1);border:3px solid var(--laranja2);margin:0 auto 4px;animation:float 3s ease-in-out infinite}
+.pers-mini:nth-child(2) .pers-av{animation-delay:.3s}
+.pers-mini:nth-child(3) .pers-av{animation-delay:.6s}
+.pers-mini:nth-child(4) .pers-av{animation-delay:.9s}
+.pers-nome{font-size:clamp(9px,2.3vw,12px);font-weight:800;color:var(--marrom)}
+
+/* ─── NAV BOTTOM — safe area para iPhone ─────────── */
+.nav-b{position:fixed;bottom:0;left:0;right:0;background:#fff;
+  border-top:2px solid var(--cinza);display:flex;z-index:100;
+  box-shadow:0 -3px 16px rgba(0,0,0,.08);
+  padding-bottom:var(--safe-b)}
+.nav-btn{flex:1;padding:12px 0 8px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;border:none;background:transparent;font-family:'Nunito',sans-serif;
+  transition:transform .1s;color:#bbb;min-height:56px}
+.nav-btn:active{transform:scale(.9)}
+.nav-btn.ativo{color:var(--laranja)}
+.nav-ic{font-size:clamp(22px,5.5vw,26px);line-height:1.2}
+.nav-lbl{font-size:clamp(10px,2.5vw,12px);font-weight:800}
+
+/* ═══════════════════════════════════════════════════
+   TELA 3 — MISSÃO
+═══════════════════════════════════════════════════ */
+#tela-missao{background:var(--bg)}
+.miss-header{background:#fff;padding:clamp(11px,2.8vw,15px) clamp(14px,3.5vw,18px);
+  display:flex;align-items:center;gap:clamp(10px,2.5vw,13px);
+  border-bottom:3px solid var(--cinza);box-shadow:var(--s1)}
+.btn-volta{width:clamp(42px,10.5vw,48px);height:clamp(42px,10.5vw,48px);border-radius:var(--rs);
+  border:3px solid var(--cinza);background:#fff;font-size:clamp(17px,4.5vw,21px);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .1s;flex-shrink:0}
+.btn-volta:active{transform:scale(.9)}
+.miss-prog-bg{flex:1;background:var(--cinza);border-radius:100px;height:clamp(10px,2.5vw,13px);overflow:hidden}
+.miss-prog-fill{height:100%;background:linear-gradient(90deg,var(--verde),#69F0AE);border-radius:100px;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+.miss-xp-badge{background:var(--amarelo);color:var(--marrom);border-radius:100px;
+  padding:4px clamp(10px,2.5vw,13px);font-size:var(--f-sm);font-weight:900;flex-shrink:0}
+.q-counter{text-align:center;font-size:var(--f-sm);font-weight:800;color:#bbb;padding:8px 0 0}
+
+/* Área rolável da atividade */
+.at-area{flex:1;padding:clamp(12px,3vw,16px) clamp(14px,3.5vw,18px);
+  display:flex;flex-direction:column;align-items:center;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:clamp(20px,5vw,28px)}
+
+.at-titulo{font-size:var(--f-lg);font-weight:900;text-align:center;margin-bottom:3px}
+.at-inst{font-size:var(--f-md);text-align:center;color:#aaa;font-weight:700;margin-bottom:clamp(12px,3vw,18px)}
+
+/* Personagem */
+.pers-reacao{text-align:center;margin-bottom:clamp(10px,2.5vw,16px)}
+.pers-reacao-av{font-size:clamp(42px,11vw,56px);animation:float 3s ease-in-out infinite;display:inline-block;line-height:1.2}
+.pers-fala{background:#fff;border-radius:var(--r);padding:clamp(8px,2vw,10px) clamp(14px,3.5vw,18px);
+  font-size:var(--f-md);font-weight:700;box-shadow:var(--s1);margin:6px auto 0;
+  border:2px solid var(--laranja2);max-width:min(280px, 85vw)}
+
+/* Feedback */
+.feedback{text-align:center;font-size:var(--f-md);font-weight:900;margin-top:9px;min-height:24px;transition:all .3s}
+.feedback.ok{color:var(--verde)}
+.feedback.err{color:var(--rosa)}
+
+/* Botão confirmar */
+.btn-conf{background:linear-gradient(135deg,var(--verde),#2ECC71);color:#fff;border:none;
+  border-radius:100px;padding:clamp(13px,3.3vw,16px) clamp(30px,7.5vw,44px);
+  font-family:'Nunito',sans-serif;font-size:var(--f-lg);font-weight:900;cursor:pointer;
+  box-shadow:0 5px 0 #1a7a3d,var(--s1);transition:transform .1s,box-shadow .1s;
+  width:100%;max-width:min(300px,90vw);margin-top:12px;min-height:56px}
+.btn-conf:active{transform:translateY(3px);box-shadow:0 2px 0 #1a7a3d}
+.btn-conf:disabled{opacity:.35;cursor:not-allowed}
+.btn-conf.sec{background:linear-gradient(135deg,var(--rosa),#E91E8C);box-shadow:0 5px 0 #a00040,var(--s1)}
+.btn-conf.sec:active{box-shadow:0 2px 0 #a00040}
+
+/* ─── ATIVIDADE: CHEF DETETIVE ─────────────────── */
+/* Grid adaptativo: 2 colunas em qualquer tela, tamanho mínimo garantido */
+.opcoes-grid{display:grid;grid-template-columns:repeat(2,1fr);
+  gap:clamp(10px,2.5vw,13px);width:100%;max-width:min(380px,95vw)}
+.op-card{background:#fff;border-radius:var(--r);padding:clamp(10px,2.5vw,14px);
+  text-align:center;border:4px solid transparent;box-shadow:var(--s1);
+  cursor:pointer;transition:transform .15s,border-color .2s;
+  -webkit-user-select:none;user-select:none;min-height:clamp(100px,25vw,130px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+.op-card:active{transform:scale(.93)}
+.op-card.correta{border-color:var(--verde);background:#E8F5E9}
+.op-card.errada{border-color:var(--rosa);background:#FCE4EC;animation:shake .4s ease}
+.op-card.off{pointer-events:none;opacity:.5}
+.op-em{font-size:clamp(36px,10vw,52px);margin-bottom:4px;line-height:1.1}
+.op-lbl{font-size:clamp(13px,3.3vw,18px);font-weight:900}
+.audio-btn{background:linear-gradient(135deg,var(--azul),#1E90FF);color:#fff;border:none;
+  border-radius:var(--r);padding:clamp(14px,3.5vw,18px) clamp(22px,5.5vw,36px);
+  font-family:'Nunito',sans-serif;font-size:var(--f-lg);font-weight:900;
+  cursor:pointer;box-shadow:var(--s1);margin-bottom:clamp(14px,3.5vw,22px);
+  display:flex;align-items:center;gap:10px;transition:transform .15s;min-height:56px}
+.audio-btn:active{transform:scale(.95)}
+
+/* ─── ATIVIDADE: SÍLABA MÁGICA ─────────────────── */
+.silaba-area{width:100%;max-width:min(370px,96vw)}
+.cons-grid{display:flex;gap:clamp(8px,2.2vw,11px);justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.letra-ing{width:clamp(56px,14.5vw,70px);height:clamp(56px,14.5vw,70px);border-radius:var(--rs);
+  display:flex;align-items:center;justify-content:center;font-size:clamp(26px,7vw,34px);
+  font-weight:900;cursor:pointer;box-shadow:var(--s1);border:3px solid transparent;
+  transition:transform .15s,border .15s;-webkit-user-select:none;user-select:none}
+.letra-ing:active{transform:scale(1.1)}
+.letra-ing.sel{border:3px solid var(--marrom);transform:scale(1.06)}
+.tigela-wrap{text-align:center}
+.tigela-lbl{font-size:var(--f-md);font-weight:800;margin-bottom:6px}
+.tigela{width:clamp(120px,32vw,150px);height:clamp(120px,32vw,150px);
+  border-radius:50% 50% 55% 55%;background:linear-gradient(180deg,#FFF9C4,#FFF176);
+  border:5px solid var(--laranja);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 8px;font-size:clamp(36px,10vw,48px);font-weight:900;color:var(--marrom);
+  box-shadow:inset 0 4px 16px rgba(0,0,0,.08),var(--s1);position:relative;transition:all .3s}
+.tigela-result{font-size:clamp(26px,7vw,36px);font-weight:900;color:var(--laranja)}
+.vogais-row{display:flex;gap:clamp(7px,1.8vw,10px);justify-content:center;margin-top:10px}
+.vog-btn{width:clamp(42px,10.5vw,52px);height:clamp(42px,10.5vw,52px);border-radius:var(--rs);
+  background:linear-gradient(135deg,var(--rosa),#F48FB1);color:#fff;
+  font-size:clamp(20px,5.5vw,26px);font-weight:900;border:none;cursor:pointer;
+  box-shadow:var(--s1);transition:transform .13s;-webkit-user-select:none;user-select:none;min-height:42px}
+.vog-btn:active{transform:scale(.88)}
+.vog-btn.sel{border:3px solid var(--marrom);transform:scale(1.06)}
+
+/* ─── ATIVIDADE: PALAVRAS NO PRATO ─────────────── */
+.prato-area{width:100%;max-width:min(370px,96vw)}
+.pal-img{width:clamp(96px,24vw,130px);height:clamp(96px,24vw,130px);border-radius:var(--r);
+  background:#fff;border:4px solid var(--laranja2);display:flex;align-items:center;
+  justify-content:center;font-size:clamp(54px,14vw,74px);margin:0 auto 12px;box-shadow:var(--s1)}
+.prato{background:#fff;border-radius:var(--r);padding:clamp(10px,2.5vw,14px);
+  display:flex;gap:clamp(5px,1.5vw,7px);justify-content:center;flex-wrap:wrap;
+  border:4px dashed var(--laranja2);min-height:clamp(58px,14vw,68px);align-items:center;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.05);margin-bottom:12px}
+.prato-vazio{color:#ccc;font-size:var(--f-sm);font-weight:700}
+.sil-disp{display:flex;gap:clamp(7px,2vw,9px);justify-content:center;flex-wrap:wrap}
+.sil-btn{padding:clamp(9px,2.3vw,12px) clamp(12px,3vw,18px);border-radius:var(--rs);
+  border:3px solid transparent;font-family:'Nunito',sans-serif;
+  font-size:clamp(20px,5.5vw,26px);font-weight:900;cursor:pointer;box-shadow:var(--s1);
+  transition:transform .13s;-webkit-user-select:none;user-select:none;
+  min-width:clamp(52px,13vw,64px);text-align:center;min-height:52px}
+.sil-btn:active{transform:scale(.91)}
+.sil-btn.usada{opacity:.26;cursor:not-allowed;pointer-events:none}
+.sil-prato{padding:clamp(7px,1.8vw,9px) clamp(12px,3vw,16px);border-radius:var(--rs);
+  font-size:clamp(18px,5vw,24px);font-weight:900;cursor:pointer;box-shadow:var(--s1);
+  animation:popIn .3s ease;color:#fff}
+
+/* ─── ATIVIDADE: INGREDIENTE SECRETO ───────────── */
+.secret-area{width:100%;max-width:min(370px,96vw)}
+.pal-hint-img{width:clamp(80px,20vw,110px);height:clamp(80px,20vw,110px);border-radius:var(--r);
+  background:#fff;border:4px solid var(--azul);display:flex;align-items:center;
+  justify-content:center;font-size:clamp(46px,12vw,64px);margin:0 auto 12px;box-shadow:var(--s1)}
+.lacuna-row{display:flex;gap:clamp(6px,1.8vw,9px);justify-content:center;align-items:center;
+  margin-bottom:18px;flex-wrap:wrap}
+.sil-show{background:#fff;border-radius:var(--rs);padding:clamp(9px,2.3vw,12px) clamp(13px,3.3vw,18px);
+  font-size:clamp(26px,7vw,34px);font-weight:900;box-shadow:var(--s1);border:3px solid var(--cinza)}
+.lacuna-box{background:var(--cinza);border-radius:var(--rs);padding:clamp(9px,2.3vw,12px) clamp(13px,3.3vw,18px);
+  font-size:clamp(26px,7vw,34px);font-weight:900;min-width:clamp(52px,13vw,64px);
+  text-align:center;border:4px dashed var(--laranja);color:transparent;transition:all .3s}
+.lacuna-box.prench{background:linear-gradient(135deg,var(--amarelo),var(--laranja2));
+  color:var(--marrom);border-style:solid;animation:popIn .3s ease}
+.letras-grid{display:flex;gap:clamp(7px,2vw,9px);justify-content:center;flex-wrap:wrap}
+.letra-op{width:clamp(52px,13vw,62px);height:clamp(52px,13vw,62px);border-radius:var(--rs);
+  font-size:clamp(22px,6vw,30px);font-weight:900;border:3px solid transparent;cursor:pointer;
+  box-shadow:var(--s1);font-family:'Nunito',sans-serif;transition:transform .13s;
+  -webkit-user-select:none;user-select:none;min-height:52px}
+.letra-op:active{transform:scale(.88)}
+.letra-op.correta{border-color:var(--verde);background:#E8F5E9!important}
+.letra-op.errada{border-color:var(--rosa);background:#FCE4EC!important;animation:shake .4s ease}
+.letra-op.off{opacity:.35;pointer-events:none}
+
+/* ─── ATIVIDADE: COMPLETE A RECEITA ────────────── */
+.frase-area{width:100%;max-width:min(380px,96vw)}
+.frase-display{background:#fff;border-radius:var(--r);padding:clamp(14px,3.5vw,18px);
+  font-size:clamp(18px,5vw,26px);font-weight:900;text-align:center;box-shadow:var(--s1);
+  margin-bottom:clamp(14px,3.5vw,18px);line-height:1.5;border:3px solid var(--azul)}
+.lacuna-inline{background:var(--cinza);border-radius:8px;padding:1px 12px;
+  border-bottom:4px solid var(--laranja);color:transparent;display:inline-block;min-width:72px}
+.lacuna-inline.prench{background:linear-gradient(135deg,var(--amarelo),var(--laranja2));
+  color:var(--marrom);border-color:transparent;animation:popIn .3s ease}
+.opcoes-frase{display:flex;flex-direction:column;gap:clamp(8px,2vw,10px);width:100%}
+.op-frase{background:#fff;border-radius:var(--rs);padding:clamp(13px,3.3vw,16px) clamp(16px,4vw,20px);
+  font-size:clamp(17px,4.5vw,22px);font-weight:900;border:4px solid transparent;
+  box-shadow:var(--s1);cursor:pointer;text-align:center;transition:transform .13s;min-height:56px;
+  display:flex;align-items:center;justify-content:center}
+.op-frase:active{transform:scale(.97)}
+.op-frase.correta{border-color:var(--verde);background:#E8F5E9}
+.op-frase.errada{border-color:var(--rosa);background:#FCE4EC;animation:shake .4s ease}
+.op-frase.off{pointer-events:none;opacity:.5}
+
+/* ═══════════════════════════════════════════════════
+   TELA 4 — CELEBRAÇÃO
+═══════════════════════════════════════════════════ */
+#tela-celebracao{background:linear-gradient(135deg,#FFD700,#FF8C00);
+  align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.confetti-cont{position:fixed;inset:0;pointer-events:none;z-index:0}
+.confetti-p{position:absolute;top:-20px;font-size:clamp(16px,4vw,22px);animation:confettiDrop linear forwards}
+.cel-content{z-index:1;padding:clamp(28px,7vw,40px) clamp(20px,5vw,30px)}
+.cel-em{font-size:clamp(68px,18vw,90px);display:block;animation:bounce .8s ease-in-out infinite;margin-bottom:12px;line-height:1.1}
+.cel-titulo{font-size:clamp(26px,7vw,36px);font-weight:900;color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.2);margin-bottom:6px}
+.cel-msg{font-size:var(--f-lg);color:rgba(255,255,255,.9);font-weight:700;margin-bottom:16px}
+.cel-xp{background:#fff;color:var(--laranja);font-size:clamp(20px,5.5vw,26px);font-weight:900;
+  padding:clamp(10px,2.5vw,13px) clamp(24px,6vw,34px);border-radius:100px;
+  display:inline-block;box-shadow:var(--s2);margin-bottom:clamp(20px,5vw,26px);animation:popIn .5s ease}
+.btn-prox{background:var(--marrom);color:#fff;border:none;border-radius:100px;
+  padding:clamp(13px,3.3vw,16px) clamp(30px,7.5vw,42px);font-family:'Nunito',sans-serif;
+  font-size:var(--f-lg);font-weight:900;cursor:pointer;box-shadow:var(--s2);
+  transition:transform .1s;min-height:56px}
+.btn-prox:active{transform:scale(.95)}
+
+/* ═══════════════════════════════════════════════════
+   MODAIS
+═══════════════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
+  align-items:center;justify-content:center;z-index:200;
+  padding:clamp(16px,4vw,24px)}
+.modal-overlay.ativo{display:flex}
+.modal-box{background:#fff;border-radius:var(--r);padding:clamp(20px,5vw,28px);
+  text-align:center;max-width:min(340px,92vw);width:100%;box-shadow:var(--s2);animation:popIn .4s ease}
+.modal-em{font-size:clamp(44px,12vw,60px);margin-bottom:9px;line-height:1.2}
+.modal-titulo{font-size:var(--f-lg);font-weight:900;margin-bottom:6px}
+.modal-txt{font-size:var(--f-md);font-weight:600;color:#777;margin-bottom:16px}
+.modal-btn{background:var(--laranja);color:#fff;border:none;border-radius:100px;
+  padding:clamp(12px,3vw,15px) clamp(28px,7vw,36px);font-family:'Nunito',sans-serif;
+  font-size:var(--f-md);font-weight:900;cursor:pointer;width:100%;margin-top:5px;min-height:52px}
+.modal-btn.sec{background:var(--cinza);color:var(--marrom)}
+
+/* ═══════════════════════════════════════════════════
+   TELA 5 — PERFIL
+═══════════════════════════════════════════════════ */
+#tela-perfil{background:var(--bg);padding-bottom:calc(var(--nav-h) + 16px)}
+.perf-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.perf-header{background:linear-gradient(135deg,var(--rosa),#C0392B);
+  padding:clamp(20px,5vw,30px) clamp(14px,3.5vw,20px) clamp(28px,7vw,38px);
+  border-radius:0 0 26px 26px;color:#fff;text-align:center}
+.perf-av{width:clamp(72px,18vw,96px);height:clamp(72px,18vw,96px);border-radius:50%;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(40px,10vw,54px);margin:0 auto 9px;border:4px solid var(--amarelo);box-shadow:var(--s2)}
+.perf-nome{font-size:clamp(20px,5.5vw,26px);font-weight:900}
+.perf-titulo{font-size:var(--f-md);opacity:.9;font-weight:700}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2.5vw,12px);
+  padding:clamp(14px,3.5vw,18px)}
+.stat-c{background:#fff;border-radius:var(--r);padding:clamp(14px,3.5vw,18px);text-align:center;box-shadow:var(--s1)}
+.stat-ic{font-size:clamp(28px,7.5vw,38px);margin-bottom:4px}
+.stat-val{font-size:clamp(22px,6vw,30px);font-weight:900;color:var(--laranja)}
+.stat-lbl{font-size:var(--f-sm);font-weight:700;color:#aaa}
+.chap-sec,.marcos-sec{padding:0 clamp(14px,3.5vw,18px) clamp(14px,3.5vw,18px)}
+.chap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,2.2vw,11px)}
+.chap-c{background:#fff;border-radius:var(--r);padding:clamp(10px,2.5vw,13px);text-align:center;box-shadow:var(--s1);border:3px solid transparent}
+.chap-c.desbloq{border-color:var(--amarelo)}
+.chap-c.lock{opacity:.38}
+.chap-em{font-size:clamp(26px,7vw,34px);margin-bottom:3px}
+.chap-nm{font-size:clamp(9px,2.4vw,12px);font-weight:800}
+.marco-item{display:flex;gap:clamp(10px,2.5vw,13px);padding:clamp(9px,2.2vw,11px) 0;border-bottom:2px dashed var(--cinza)}
+.marco-item:last-child{border-bottom:none}
+.marco-dot{width:clamp(34px,8.5vw,42px);height:clamp(34px,8.5vw,42px);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4.2vw,20px);flex-shrink:0}
+.marco-dot.got{background:linear-gradient(135deg,var(--amarelo),var(--laranja))}
+.marco-dot.next{background:var(--cinza)}
+.marco-info{flex:1;min-width:0}
+.marco-tit{font-size:var(--f-md);font-weight:800}
+.marco-dt{font-size:var(--f-sm);color:#bbb;font-weight:600}
+.marco-st{font-size:clamp(9px,2.3vw,11px);font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+.marco-st.ok{color:var(--verde)}
+.marco-st.pend{color:#CCC}
+
+/* ═══════════════════════════════════════════════════
+   TABLET (≥ 600px) — grid de 3 colunas, mais espaço
+═══════════════════════════════════════════════════ */
+@media(min-width:600px){
+  .fases-grid{grid-template-columns:repeat(3,1fr)}
+  .opcoes-grid{grid-template-columns:repeat(2,1fr);max-width:420px}
+  .chap-grid{grid-template-columns:repeat(3,1fr)}
+  .hbody,.at-area{padding-left:clamp(20px,4vw,36px);padding-right:clamp(20px,4vw,36px)}
+}
+
+/* TABLET largo (≥ 768px) — centraliza conteúdo */
+@media(min-width:768px){
+  .home-header,.miss-header,.perf-header{max-width:640px;margin:0 auto;border-radius:var(--r)}
+  .hbody,.perf-body{max-width:640px;margin:0 auto}
+  .at-area{max-width:640px;margin:0 auto;width:100%}
+  .fases-grid{grid-template-columns:repeat(3,1fr)}
+  .opcoes-grid{max-width:440px}
+  .nav-b{max-width:640px;left:50%;transform:translateX(-50%);border-radius:var(--r) var(--r) 0 0;border:2px solid var(--cinza)}
+}
+
+/* iPhone SE e telas muito pequenas (< 360px) */
+@media(max-width:359px){
+  .htop{gap:7px}
+  .lara-av{width:46px;height:46px;font-size:24px}
+  .streak-b{padding:6px 8px}
+  .cons-grid{gap:6px}
+  .vogais-row{gap:5px}
+}
+
+/* ═══════════════════════════════════════════════════
+   TELA LOGIN
+═══════════════════════════════════════════════════ */
+#tela-login{background:linear-gradient(135deg,#FF8C00,#FFD700 45%,#FF6B9D);
+  align-items:center;justify-content:center;position:relative;overflow:hidden}
+.login-bolha{position:absolute;border-radius:50%;background:rgba(255,255,255,.12);animation:float 3s ease-in-out infinite}
+.login-bolha:nth-child(1){width:clamp(50px,14vw,88px);height:clamp(50px,14vw,88px);top:6%;left:4%}
+.login-bolha:nth-child(2){width:clamp(36px,9vw,54px);height:clamp(36px,9vw,54px);top:16%;right:7%;animation-delay:.5s}
+.login-bolha:nth-child(3){width:clamp(68px,17vw,126px);height:clamp(68px,17vw,126px);bottom:10%;left:5%;animation-delay:1s}
+.login-box{background:#fff;border-radius:var(--r);padding:clamp(24px,6vw,36px) clamp(20px,5vw,32px);
+  width:min(360px,90vw);box-shadow:var(--s2);z-index:1;animation:popIn .4s ease}
+.login-logo{font-size:clamp(52px,14vw,72px);text-align:center;margin-bottom:4px;animation:float 2.5s ease-in-out infinite;display:block;line-height:1.2}
+.login-titulo{font-size:var(--f-xl);font-weight:900;color:var(--marrom);text-align:center;line-height:1.2;margin-bottom:2px}
+.login-sub{font-size:var(--f-sm);color:#aaa;font-weight:700;text-align:center;margin-bottom:clamp(18px,4.5vw,26px)}
+.login-campo{margin-bottom:clamp(12px,3vw,16px)}
+.login-label{display:block;font-size:var(--f-sm);font-weight:800;color:var(--marrom);margin-bottom:6px}
+.login-input{width:100%;border:3px solid var(--cinza);border-radius:var(--rs);
+  padding:clamp(12px,3vw,15px) clamp(14px,3.5vw,18px);font-family:'Nunito',sans-serif;
+  font-size:var(--f-lg);font-weight:700;color:var(--marrom);background:#FFFBF0;
+  outline:none;transition:border .2s;-webkit-appearance:none;appearance:none}
+.login-input:focus{border-color:var(--laranja)}
+.login-input.erro{border-color:var(--rosa);animation:shake .4s ease}
+.login-erro{color:var(--rosa);font-size:var(--f-sm);font-weight:800;
+  text-align:center;margin-top:8px;min-height:20px}
+.btn-login{background:linear-gradient(135deg,var(--laranja),var(--laranja2));color:#fff;
+  border:none;border-radius:100px;width:100%;padding:clamp(14px,3.5vw,17px);
+  font-family:'Nunito',sans-serif;font-size:var(--f-lg);font-weight:900;cursor:pointer;
+  box-shadow:0 5px 0 #b35e00,var(--s1);transition:transform .1s,box-shadow .1s;
+  margin-top:clamp(6px,2vw,10px);min-height:56px}
+.btn-login:active{transform:translateY(3px);box-shadow:0 2px 0 #b35e00}
+.btn-login:disabled{opacity:.5;cursor:not-allowed}
+.login-loading{display:none;text-align:center;padding:10px;font-size:var(--f-md);font-weight:800;color:var(--laranja)}
+.login-spinner{display:inline-block;animation:spin 1s linear infinite;margin-right:6px}
+</style>
+</head>
+<body>
+<div id="aviso-offline">📡 Modo offline — progresso salvo no aparelho!</div>
+
+<!-- LOGIN -->
+<div id="tela-login" class="tela ativa">
+  <div class="login-bolha"></div><div class="login-bolha"></div><div class="login-bolha"></div>
+  <div class="login-box">
+    <span class="login-logo">🧑‍🍳</span>
+    <div class="login-titulo">Cozinha Mágica<br>das Letras!</div>
+    <div class="login-sub">Entre para começar a cozinhar! 🍳</div>
+    <div class="login-campo">
+      <label class="login-label" for="inp-usuario">👤 Usuário</label>
+      <input class="login-input" id="inp-usuario" type="text"
+        placeholder="seu usuário" autocomplete="username"
+        autocorrect="off" autocapitalize="none" spellcheck="false"
+        onkeydown="if(event.key==='Enter') document.getElementById('inp-senha').focus()">
+    </div>
+    <div class="login-campo">
+      <label class="login-label" for="inp-senha">🔑 Senha</label>
+      <input class="login-input" id="inp-senha" type="password"
+        placeholder="sua senha" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') fazerLogin()">
+    </div>
+    <div class="login-erro" id="login-erro"></div>
+    <button class="btn-login" id="btn-login-ok" onclick="fazerLogin()">
+      🚪 Entrar na Cozinha!
+    </button>
+    <div class="login-loading" id="login-loading">
+      <span class="login-spinner">🌀</span> Carregando seu progresso...
+    </div>
+  </div>
+</div>
+
+<!-- SPLASH -->
+<div id="tela-splash" class="tela">
+  <div class="splash-bolha"></div><div class="splash-bolha"></div>
+  <div class="splash-bolha"></div><div class="splash-bolha"></div>
+  <div class="splash-content">
+    <span class="splash-logo">🧑‍🍳</span>
+    <div class="splash-titulo">Cozinha Mágica<br>das Letras!</div>
+    <div class="splash-sub">Onde aprender a ler é uma aventura deliciosa 🍳</div>
+    <div class="splash-nome">👧 Lara Melissa</div>
+    <button class="btn-entrar" onclick="ir('tela-home')" style="pointer-events:none;opacity:0">🚪 Entrar na Cozinha!</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="tela-home" class="tela">
+  <div class="home-header">
+    <div class="htop">
+      <div class="lara-av" onclick="ir('tela-perfil')">👩‍🍳</div>
+      <div class="hinfo">
+        <div class="hola">Olá, Chef!</div>
+        <div class="hnome">Lara Melissa 🌟</div>
+        <div class="hchapeu" id="h-chapeu">🎓 Ajudante da Cozinha</div>
+      </div>
+      <div class="streak-b" onclick="abrirModal('m-streak')">
+        <div class="sfogo">🔥</div>
+        <div class="snum" id="h-streak">0</div>
+        <div class="slabel">dias</div>
+      </div>
+    </div>
+    <div class="xp-label">
+      <span>⭐ Estrelas de Chef</span>
+      <span id="h-xp">0 XP</span>
+    </div>
+    <div class="xp-bg"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+  <div class="hbody">
+    <div class="stitle">📋 Receitas de Hoje</div>
+    <div class="rec-card" id="rec-card"></div>
+    <div class="stitle">🗺️ Estações da Cozinha</div>
+    <div class="fases-grid" id="fases-grid"></div>
+    <div class="stitle">👫 Seus Amigos Chef</div>
+    <div class="pers-row">
+      <div class="pers-mini"><div class="pers-av">👨‍🍳</div><div class="pers-nome">Pai Winison</div></div>
+      <div class="pers-mini"><div class="pers-av">👩‍🍳</div><div class="pers-nome">Mãe Luana</div></div>
+      <div class="pers-mini"><div class="pers-av">👦</div><div class="pers-nome">Pedro</div></div>
+      <div class="pers-mini"><div class="pers-av">👧</div><div class="pers-nome">Laisa</div></div>
+      <div class="pers-mini"><div class="pers-av">🧒</div><div class="pers-nome">Geovana</div></div>
+      <div class="pers-mini"><div class="pers-av">👶</div><div class="pers-nome">Laura</div></div>
+    </div>
+  </div>
+  <nav class="nav-b">
+    <button class="nav-btn ativo" onclick="ir('tela-home')"><span class="nav-ic">🏠</span><span class="nav-lbl">Cozinha</span></button>
+    <button class="nav-btn" onclick="ir('tela-perfil')"><span class="nav-ic">🏆</span><span class="nav-lbl">Conquistas</span></button>
+    <button class="nav-btn" onclick="confirmarLogout()"><span class="nav-ic">🚪</span><span class="nav-lbl">Sair</span></button>
+  </nav>
+</div>
+
+<!-- MISSÃO -->
+<div id="tela-missao" class="tela">
+  <div class="miss-header">
+    <button class="btn-volta" onclick="abrirModal('m-volta')">←</button>
+    <div class="miss-prog-bg"><div class="miss-prog-fill" id="miss-prog" style="width:0%"></div></div>
+    <div class="miss-xp-badge">+<span id="miss-xp">20</span>⭐</div>
+  </div>
+  <div class="q-counter" id="q-counter"></div>
+  <div class="at-area" id="at-area"></div>
+</div>
+
+<!-- CELEBRAÇÃO -->
+<div id="tela-celebracao" class="tela">
+  <div class="confetti-cont" id="confetti"></div>
+  <div class="cel-content">
+    <span class="cel-em" id="cel-em">🎉</span>
+    <div class="cel-titulo" id="cel-titulo">Incrível, Lara!</div>
+    <div class="cel-msg" id="cel-msg">Você completou a receita!</div>
+    <div class="cel-xp" id="cel-xp">+20 ⭐ Estrelas de Chef!</div>
+    <button class="btn-prox" onclick="voltarHome()">🍳 Próxima Receita!</button>
+  </div>
+</div>
+
+<!-- PERFIL -->
+<div id="tela-perfil" class="tela">
+  <div class="perf-header">
+    <div class="perf-av">👩‍🍳</div>
+    <div class="perf-nome">Lara Melissa</div>
+    <div class="perf-titulo" id="p-titulo">🎓 Ajudante da Cozinha</div>
+  </div>
+  <div class="perf-body">
+    <div class="stats-grid">
+      <div class="stat-c"><div class="stat-ic">⭐</div><div class="stat-val" id="p-xp">0</div><div class="stat-lbl">Estrelas de Chef</div></div>
+      <div class="stat-c"><div class="stat-ic">🔥</div><div class="stat-val" id="p-streak">0</div><div class="stat-lbl">Dias seguidos</div></div>
+      <div class="stat-c"><div class="stat-ic">✅</div><div class="stat-val" id="p-miss">0</div><div class="stat-lbl">Atividades feitas</div></div>
+      <div class="stat-c"><div class="stat-ic">🏅</div><div class="stat-val" id="p-marcos">0</div><div class="stat-lbl">Marcos ganhos</div></div>
+    </div>
+    <div class="chap-sec">
+      <div class="stitle">👨‍🍳 Chapéus de Chef</div>
+      <div class="chap-grid" id="chap-grid"></div>
+    </div>
+    <div class="marcos-sec">
+      <div class="stitle">🗓️ Minha Jornada</div>
+      <div id="marcos-lista"></div>
+    </div>
+  </div>
+  <nav class="nav-b">
+    <button class="nav-btn" onclick="ir('tela-home')"><span class="nav-ic">🏠</span><span class="nav-lbl">Cozinha</span></button>
+    <button class="nav-btn ativo" onclick="ir('tela-perfil')"><span class="nav-ic">🏆</span><span class="nav-lbl">Conquistas</span></button>
+    <button class="nav-btn" onclick="confirmarLogout()"><span class="nav-ic">🚪</span><span class="nav-lbl">Sair</span></button>
+  </nav>
+</div>
+
+<!-- MODAIS -->
+<div class="modal-overlay" id="m-streak">
+  <div class="modal-box">
+    <div class="modal-em">🔥</div>
+    <div class="modal-titulo">Foguinho de Sequência!</div>
+    <div class="modal-txt">Você estudou <strong id="m-streak-n">0</strong> dias seguidos!<br>Continue assim! Não apague o foguinho! 🧡</div>
+    <button class="modal-btn" onclick="fecharModal('m-streak')">Entendi! 💪</button>
+  </div>
+</div>
+<div class="modal-overlay" id="m-volta">
+  <div class="modal-box">
+    <div class="modal-em">🤔</div>
+    <div class="modal-titulo">Sair da receita?</div>
+    <div class="modal-txt">Você vai perder o progresso desta atividade.</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="modal-btn sec" onclick="fecharModal('m-volta')">Continuar 👩‍🍳</button>
+      <button class="modal-btn" style="background:var(--rosa)" onclick="voltarHome()">Sair</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="m-dia-completo">
+  <div class="modal-box">
+    <div class="modal-em">🎊</div>
+    <div class="modal-titulo">Dia Completo, Lara!</div>
+    <div class="modal-txt">Você fez todas as 3 receitas de hoje! Que chef incrível! Volte amanhã para novas receitas! 💛</div>
+    <button class="modal-btn" onclick="fecharModal('m-dia-completo');voltarHome()">Eba! Até amanhã! 🌙</button>
+  </div>
+</div>
+<div class="modal-overlay" id="m-fase-nova">
+  <div class="modal-box">
+    <div class="modal-em" id="mfn-em">🎉</div>
+    <div class="modal-titulo" id="mfn-titulo">Nova Fase Desbloqueada!</div>
+    <div class="modal-txt" id="mfn-txt">Parabéns! Você avançou para a próxima fase!</div>
+    <button class="modal-btn" onclick="fecharModal('m-fase-nova')">Continuar 🚀</button>
+  </div>
+</div>
+<div class="modal-overlay" id="m-logout">
+  <div class="modal-box">
+    <div class="modal-em">🚪</div>
+    <div class="modal-titulo">Sair da Cozinha?</div>
+    <div class="modal-txt">Seu progresso está salvo. Até a próxima, Lara! 💛</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="modal-btn sec" onclick="fecharModal('m-logout')">Ficar 👩‍🍳</button>
+      <button class="modal-btn" style="background:var(--rosa)" onclick="fazerLogout()">Sair</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIGURAÇÃO — Pai Winison, cole seus dados aqui
+// Encontre em: supabase.com → projeto → Settings → API
+// ═══════════════════════════════════════════════
+const SUPABASE_URL = 'https://emlgnhzgowinvrknmyml.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_4EKfu5nZllfWrDunaBSr1A_YfTKKOMj';
+const SUPABASE_ON = SUPABASE_URL !== 'COLE_SUA_URL_AQUI';
+
+// Credenciais de acesso (login simples, não mude)
+const CREDENCIAIS = { usuario: 'lara', senha: 'melissa' };
+
+// ═══════════════════════════════════════════════
+// SUPABASE CLIENT — chamadas REST diretas (sem SDK)
+// ═══════════════════════════════════════════════
+const SB = {
+  headers: () => ({
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY
+  }),
+
+  // Busca o progresso do usuário
+  async buscar(usuario) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/progresso?usuario=eq.${encodeURIComponent(usuario)}&limit=1`,
+        { headers: SB.headers() }
+      );
+      if (!res.ok) return null;
+      const rows = await res.json();
+      return rows.length > 0 ? rows[0] : null;
+    } catch(e) { console.warn('Supabase buscar erro:', e); return null; }
+  },
+
+  // Cria registro novo
+  async criar(usuario, dados) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/progresso`,
+        { method: 'POST', headers: { ...SB.headers(), 'Prefer': 'return=representation' },
+          body: JSON.stringify({ usuario, ...dados }) }
+      );
+      if (!res.ok) return null;
+      const rows = await res.json();
+      return rows[0] || null;
+    } catch(e) { console.warn('Supabase criar erro:', e); return null; }
+  },
+
+  // Atualiza registro existente
+  async salvar(usuario, dados) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/progresso?usuario=eq.${encodeURIComponent(usuario)}`,
+        { method: 'PATCH', headers: { ...SB.headers(), 'Prefer': 'return=minimal' },
+          body: JSON.stringify(dados) }
+      );
+      return res.ok;
+    } catch(e) { console.warn('Supabase salvar erro:', e); return false; }
+  }
+};
+
+// ═══════════════════════════════════════════════
+// CONSTANTES DO JOGO
+// ═══════════════════════════════════════════════
+const FASES_DEF = [
+  { id:1, nome:'Ingredientes', sub:'Conhecendo as Letras', ic:'🔤', xpMin:0,    xpMax:200,  sem:'Maio' },
+  { id:2, nome:'Na Tigela',    sub:'Misturando Sílabas',   ic:'🥣', xpMin:200,  xpMax:500,  sem:'Junho' },
+  { id:3, nome:'Nos Pratos',   sub:'Montando Palavras',    ic:'🍽️', xpMin:500,  xpMax:900,  sem:'Julho' },
+  { id:4, nome:'Cardápio',     sub:'Lendo Frases',         ic:'📋', xpMin:900,  xpMax:1400, sem:'Ago-Set' },
+  { id:5, nome:'Treinamento',  sub:'Leitura Fluente',      ic:'📖', xpMin:1400, xpMax:2000, sem:'Out' },
+  { id:6, nome:'Chef Master!', sub:'Festa do ABC 🎉',      ic:'🏆', xpMin:2000, xpMax:3000, sem:'Nov' }
+];
+const CHAPEUS = [
+  { id:'ajudante',  nome:'Ajudante',    em:'🎓', xp:0 },
+  { id:'cozin',     nome:'Cozinheiro',  em:'👒', xp:100 },
+  { id:'sous',      nome:'Sous-Chef',   em:'🧢', xp:300 },
+  { id:'chef',      nome:'Chef',        em:'🍳', xp:600 },
+  { id:'estrela',   nome:'Chef Estrela',em:'⭐', xp:1000 },
+  { id:'master',    nome:'Chef Master!',em:'👑', xp:2000 }
+];
+const MARCOS = [
+  { id:1,  tit:'🌟 Mini Chef de Letras',           dt:'15/mai', desc:'Primeiros passos na cozinha' },
+  { id:2,  tit:'🥄 Aprendiz de Sílabas',           dt:'01/jun', desc:'Primeiras misturas dominadas' },
+  { id:3,  tit:'🌀 Misturadora Oficial',            dt:'15/jun', desc:'Todas as famílias silábicas' },
+  { id:4,  tit:'📖 Leitora de Palavras',            dt:'01/jul', desc:'Lê palavras de 2 sílabas' },
+  { id:5,  tit:'👩‍🍳 Chef das Palavras',             dt:'15/jul', desc:'Lê palavras de 3 sílabas' },
+  { id:6,  tit:'📜 Leitora de Frases',              dt:'01/ago', desc:'Lê frases simples' },
+  { id:7,  tit:'🧠 Chef de Frases',                 dt:'15/ago', desc:'Lê frases com compreensão' },
+  { id:8,  tit:'📚 Narradora da Cozinha',           dt:'01/set', desc:'Lê mini-textos' },
+  { id:9,  tit:'🎭 Chef de Histórias',              dt:'15/set', desc:'Entende e responde textos' },
+  { id:10, tit:'🚀 Sous-Chef Master',               dt:'01/out', desc:'Leitura fluente' },
+  { id:11, tit:'⭐ Chef Estrela',                   dt:'15/out', desc:'Leitura autônoma' },
+  { id:12, tit:'👑 CHEF MASTER — FESTA DO ABC!',    dt:'15/nov', desc:'A grande celebração!' }
+];
+
+// ═══════════════════════════════════════════════
+// BANCO DE CONTEÚDO PEDAGÓGICO
+// ═══════════════════════════════════════════════
+const DETETIVE_F1 = [
+  { w:'BOLA',  ops:[{em:'⚽',l:'BOLA',c:true},{em:'🐱',l:'GATO',c:false},{em:'🏠',l:'CASA',c:false},{em:'🌙',l:'LUA',c:false}] },
+  { w:'PATO',  ops:[{em:'🦆',l:'PATO',c:true},{em:'🐶',l:'CÃO',c:false},{em:'🍎',l:'UVA',c:false},{em:'🐸',l:'SAPO',c:false}] },
+  { w:'SAPO',  ops:[{em:'🐸',l:'SAPO',c:true},{em:'🐟',l:'PEIXE',c:false},{em:'🐦',l:'PÁSSARO',c:false},{em:'🦋',l:'BORBO.',c:false}] },
+  { w:'CAMA',  ops:[{em:'🛏️',l:'CAMA',c:true},{em:'🪑',l:'CADEIRA',c:false},{em:'🚗',l:'CARRO',c:false},{em:'🌸',l:'FLOR',c:false}] },
+  { w:'MELANCIA',ops:[{em:'🍉',l:'MELANCIA',c:true},{em:'🍌',l:'BANANA',c:false},{em:'🍊',l:'LARANJA',c:false},{em:'🍇',l:'UVA',c:false}] },
+  { w:'LUPA',  ops:[{em:'🔍',l:'LUPA',c:true},{em:'✏️',l:'LÁPIS',c:false},{em:'📚',l:'LIVRO',c:false},{em:'🎨',l:'TINTA',c:false}] },
+  { w:'FACA',  ops:[{em:'🔪',l:'FACA',c:true},{em:'🥄',l:'COLHER',c:false},{em:'🍴',l:'GARFO',c:false},{em:'🥢',l:'HASHI',c:false}] },
+  { w:'GATO',  ops:[{em:'🐱',l:'GATO',c:true},{em:'🐶',l:'CÃO',c:false},{em:'🐰',l:'COELHO',c:false},{em:'🐮',l:'VACA',c:false}] },
+  { w:'MAPA',  ops:[{em:'🗺️',l:'MAPA',c:true},{em:'📖',l:'LIVRO',c:false},{em:'📝',l:'PAPEL',c:false},{em:'🗒️',l:'CADERNO',c:false}] },
+  { w:'RATO',  ops:[{em:'🐭',l:'RATO',c:true},{em:'🐰',l:'COELHO',c:false},{em:'🐸',l:'SAPO',c:false},{em:'🦊',l:'RAPOSA',c:false}] },
+  { w:'TATU',  ops:[{em:'🦔',l:'TATU',c:true},{em:'🐢',l:'CÁGADO',c:false},{em:'🐌',l:'CARACOL',c:false},{em:'🦎',l:'LAGARTO',c:false}] },
+  { w:'SINO',  ops:[{em:'🔔',l:'SINO',c:true},{em:'🎺',l:'TROMPETE',c:false},{em:'🥁',l:'TAMBOR',c:false},{em:'🎻',l:'VIOLINO',c:false}] },
+  { w:'VELA',  ops:[{em:'🕯️',l:'VELA',c:true},{em:'💡',l:'LUZ',c:false},{em:'🔦',l:'LANTERNA',c:false},{em:'⚡',l:'RAIO',c:false}] },
+  { w:'NAVIO', ops:[{em:'🚢',l:'NAVIO',c:true},{em:'✈️',l:'AVIÃO',c:false},{em:'🚂',l:'TREM',c:false},{em:'🚗',l:'CARRO',c:false}] },
+  { w:'LOBO',  ops:[{em:'🐺',l:'LOBO',c:true},{em:'🦊',l:'RAPOSA',c:false},{em:'🐶',l:'CÃO',c:false},{em:'🐱',l:'GATO',c:false}] },
+];
+const DETETIVE_F2 = [
+  { w:'BONECA',  ops:[{em:'🪆',l:'BONECA',c:true},{em:'🎮',l:'JOYSTICK',c:false},{em:'🏀',l:'BOLA',c:false},{em:'🎨',l:'TINTA',c:false}] },
+  { w:'PIPOCA',  ops:[{em:'🍿',l:'PIPOCA',c:true},{em:'🍪',l:'BISCOITO',c:false},{em:'🍭',l:'PIRULITO',c:false},{em:'🍦',l:'SORVETE',c:false}] },
+  { w:'BANANA',  ops:[{em:'🍌',l:'BANANA',c:true},{em:'🍊',l:'LARANJA',c:false},{em:'🍎',l:'MAÇÃ',c:false},{em:'🍇',l:'UVA',c:false}] },
+  { w:'CAVALO',  ops:[{em:'🐴',l:'CAVALO',c:true},{em:'🐄',l:'VACA',c:false},{em:'🐖',l:'PORCO',c:false},{em:'🐑',l:'OVELHA',c:false}] },
+  { w:'JANELA',  ops:[{em:'🪟',l:'JANELA',c:true},{em:'🚪',l:'PORTA',c:false},{em:'🏠',l:'CASA',c:false},{em:'🪑',l:'CADEIRA',c:false}] },
+  { w:'TOMATE',  ops:[{em:'🍅',l:'TOMATE',c:true},{em:'🥕',l:'CENOURA',c:false},{em:'🥦',l:'BRÓCOLIS',c:false},{em:'🥔',l:'BATATA',c:false}] },
+  { w:'FOGUETE', ops:[{em:'🚀',l:'FOGUETE',c:true},{em:'✈️',l:'AVIÃO',c:false},{em:'🛸',l:'DISCO',c:false},{em:'🛩️',l:'AERONAVE',c:false}] },
+  { w:'MACACO',  ops:[{em:'🐒',l:'MACACO',c:true},{em:'🦁',l:'LEÃO',c:false},{em:'🐘',l:'ELEFANTE',c:false},{em:'🦒',l:'GIRAFA',c:false}] },
+];
+const SILABAS_GRUPOS = [
+  { cons:'B', cor:'#FF8C00', silabas:['BA','BE','BI','BO','BU'] },
+  { cons:'C', cor:'#4CAF82', silabas:['CA','CO','CU','CE','CI'] },
+  { cons:'P', cor:'#5BBDE4', silabas:['PA','PE','PI','PO','PU'] },
+  { cons:'M', cor:'#FF6B9D', silabas:['MA','ME','MI','MO','MU'] },
+  { cons:'S', cor:'#9B59B6', silabas:['SA','SE','SI','SO','SU'] },
+  { cons:'T', cor:'#E74C3C', silabas:['TA','TE','TI','TO','TU'] },
+  { cons:'L', cor:'#2ECC71', silabas:['LA','LE','LI','LO','LU'] },
+  { cons:'V', cor:'#1ABC9C', silabas:['VA','VE','VI','VO','VU'] },
+  { cons:'D', cor:'#E67E22', silabas:['DA','DE','DI','DO','DU'] },
+  { cons:'F', cor:'#3498DB', silabas:['FA','FE','FI','FO','FU'] },
+  { cons:'G', cor:'#27AE60', silabas:['GA','GO','GU','GE','GI'] },
+  { cons:'N', cor:'#8E44AD', silabas:['NA','NE','NI','NO','NU'] },
+  { cons:'R', cor:'#C0392B', silabas:['RA','RE','RI','RO','RU'] },
+];
+const PALAVRAS_F1 = [
+  { em:'⚽', pal:'BOLA',  sils:['BO','LA'],   dist:['MI','PA'] },
+  { em:'🦆', pal:'PATO',  sils:['PA','TO'],   dist:['BI','LU'] },
+  { em:'🛏️', pal:'CAMA',  sils:['CA','MA'],   dist:['LE','SO'] },
+  { em:'🐸', pal:'SAPO',  sils:['SA','PO'],   dist:['MI','BU'] },
+  { em:'🔍', pal:'LUPA',  sils:['LU','PA'],   dist:['BO','TI'] },
+  { em:'🔪', pal:'FACA',  sils:['FA','CA'],   dist:['SE','BI'] },
+  { em:'🐱', pal:'GATO',  sils:['GA','TO'],   dist:['NA','LU'] },
+  { em:'🗺️', pal:'MAPA',  sils:['MA','PA'],   dist:['BI','SU'] },
+  { em:'🐭', pal:'RATO',  sils:['RA','TO'],   dist:['ME','SU'] },
+  { em:'🕯️', pal:'VELA',  sils:['VE','LA'],   dist:['PO','BI'] },
+  { em:'🔔', pal:'SINO',  sils:['SI','NO'],   dist:['BE','LA'] },
+  { em:'🐺', pal:'LOBO',  sils:['LO','BO'],   dist:['DA','SI'] },
+  { em:'🌙', pal:'LUNA',  sils:['LU','NA'],   dist:['BI','SO'] },
+];
+const PALAVRAS_F2 = [
+  { em:'🪆', pal:'BONECA',  sils:['BO','NE','CA'],   dist:['MI','LA'] },
+  { em:'🍿', pal:'PIPOCA',  sils:['PI','PO','CA'],   dist:['LU','TE'] },
+  { em:'🍌', pal:'BANANA',  sils:['BA','NA','NA'],   dist:['LO','SI'] },
+  { em:'🐴', pal:'CAVALO',  sils:['CA','VA','LO'],   dist:['BI','TU'] },
+  { em:'🍅', pal:'TOMATE',  sils:['TO','MA','TE'],   dist:['BI','LU'] },
+  { em:'🚀', pal:'FOGUETE', sils:['FO','GUE','TE'],  dist:['BI','CA'] },
+  { em:'🐒', pal:'MACACO',  sils:['MA','CA','CO'],   dist:['LU','SI'] },
+  { em:'🪟', pal:'JANELA',  sils:['JA','NE','LA'],   dist:['BI','SO'] },
+];
+const SECRETO_F1 = [
+  { em:'⚽', pal:'BOLA', partes:['_O','LA'], lacuna:'B', ops:['B','P','M','T'] },
+  { em:'🦆', pal:'PATO', partes:['PA','T_'], lacuna:'O', ops:['A','I','O','U'] },
+  { em:'🛏️', pal:'CAMA', partes:['C_','MA'], lacuna:'A', ops:['E','A','O','I'] },
+  { em:'🐸', pal:'SAPO', partes:['S_','PO'], lacuna:'A', ops:['A','I','E','U'] },
+  { em:'🔍', pal:'LUPA', partes:['LU','P_'], lacuna:'A', ops:['E','I','A','O'] },
+  { em:'🔪', pal:'FACA', partes:['_A','CA'], lacuna:'F', ops:['F','M','B','T'] },
+  { em:'🐱', pal:'GATO', partes:['G_','TO'], lacuna:'A', ops:['A','O','I','U'] },
+  { em:'🔔', pal:'SINO', partes:['SI','N_'], lacuna:'O', ops:['A','I','O','U'] },
+  { em:'🕯️', pal:'VELA', partes:['_E','LA'], lacuna:'V', ops:['V','B','M','P'] },
+  { em:'🐭', pal:'RATO', partes:['R_','TO'], lacuna:'A', ops:['A','E','I','O'] },
+  { em:'🌙', pal:'LUNA', partes:['LU','N_'], lacuna:'A', ops:['E','A','O','I'] },
+  { em:'🐺', pal:'LOBO', partes:['L_','BO'], lacuna:'O', ops:['A','E','O','U'] },
+];
+const FRASES_F1 = [
+  { frase:'O PATO nada no ___.', lacuna:'LAGO', ops:['LAGO','FOGO','BOLO','RATO'] },
+  { frase:'A BOLA é ___ e redonda.', lacuna:'GRANDE', ops:['GRANDE','FINA','DURA','MOLE'] },
+  { frase:'O GATO bebe ___ de leite.', lacuna:'TIGELA', ops:['TIGELA','COPO','FACA','SINO'] },
+  { frase:'A ___ está na cama.', lacuna:'LARA', ops:['LARA','BOLA','VELA','LUPA'] },
+  { frase:'Eu amo a minha ___.', lacuna:'MÃE', ops:['MÃE','FACA','VELA','MAPA'] },
+  { frase:'O ___ é um animal.', lacuna:'SAPO', ops:['SAPO','LIVRO','SINO','MAPA'] },
+  { frase:'A VELA está ___ do bolo.', lacuna:'CIMA', ops:['CIMA','FORA','LUPA','RATO'] },
+  { frase:'O ___ toca bem.', lacuna:'SINO', ops:['SINO','GATO','MAPA','FACA'] },
+  { frase:'O LOBO uiva para a ___.', lacuna:'LUA', ops:['LUA','BOLA','FACA','CAMA'] },
+  { frase:'O RATO come muito ___.', lacuna:'QUEIJO', ops:['QUEIJO','BOLO','CAMA','VELA'] },
+];
+const FRASES_F2 = [
+  { frase:'A BANANA é uma ___ gostosa.', lacuna:'FRUTA', ops:['FRUTA','PEDRA','VELA','ROUPA'] },
+  { frase:'O MACACO mora na ___.', lacuna:'ÁRVORE', ops:['ÁRVORE','CAMA','MESA','BOLA'] },
+  { frase:'O FOGUETE vai para o ___.', lacuna:'ESPAÇO', ops:['ESPAÇO','JARDIM','LAGO','PÁTIO'] },
+  { frase:'A BONECA tem ___ lindos.', lacuna:'OLHOS', ops:['OLHOS','PATAS','ASAS','CASCOS'] },
+  { frase:'A PIPOCA é ___ e crocante.', lacuna:'SALGADA', ops:['SALGADA','MOLHADA','PESADA','AMARGA'] },
+  { frase:'O CAVALO corre muito ___.', lacuna:'RÁPIDO', ops:['RÁPIDO','LENTO','QUIETO','GORDO'] },
+  { frase:'O TOMATE é ___ e redondo.', lacuna:'VERMELHO', ops:['VERMELHO','AZUL','VERDE','PRETO'] },
+  { frase:'A JANELA deixa entrar a ___.', lacuna:'LUZ', ops:['LUZ','VELA','AGUA','CHUVA'] },
+  { frase:'O PRESENTE é para a ___.', lacuna:'LARA', ops:['LARA','BOLA','FACA','MAPA'] },
+];
+
+// ═══════════════════════════════════════════════
+// MISSÕES POR FASE
+// ═══════════════════════════════════════════════
+const MISSOES_POR_FASE = {
+  1: [
+    { slot:0, tipos:['detetive','secreto'], nome:'Chef Detetive',       desc:'Ouça e aponte a imagem!',       xp:20, ic:'🔊', classe:'aq' },
+    { slot:1, tipos:['silaba','silaba'],    nome:'Sílaba Mágica',       desc:'Misture consoante + vogal!',    xp:25, ic:'🥣', classe:'pr' },
+    { slot:2, tipos:['prato','frase'],      nome:'Palavras no Prato',   desc:'Monte a palavra certa!',        xp:30, ic:'🍽️', classe:'fx' }
+  ],
+  2: [
+    { slot:0, tipos:['detetive','frase'],   nome:'Chef Detetive',       desc:'Ouça a palavra!',               xp:20, ic:'🔊', classe:'aq' },
+    { slot:1, tipos:['prato','silaba'],     nome:'Palavras no Prato',   desc:'Monte palavras de 3 sílabas!',  xp:30, ic:'🍽️', classe:'pr' },
+    { slot:2, tipos:['secreto','frase'],    nome:'Ingrediente Secreto', desc:'Qual letra está faltando?',     xp:25, ic:'🔎', classe:'fx' }
+  ]
+};
+
+// ═══════════════════════════════════════════════
+// ESTADO DO JOGO
+// ═══════════════════════════════════════════════
+let G = { xp:0, streak:0, fase:1, missoesConcluidas:0, marcosDesbloqueados:[], ultimoDia:null, sessaoHoje:{feitas:[false,false,false],rotacao:0} };
+let M = { slot:-1, tipo:'', questoes:[], qAtual:0, totalQ:5, xpGanho:0, tentativas:0 };
+
+// ═══════════════════════════════════════════════
+// SESSÃO — usuário logado
+// ═══════════════════════════════════════════════
+let usuarioLogado = null;
+
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+async function fazerLogin() {
+  const usuario = document.getElementById('inp-usuario').value.trim().toLowerCase();
+  const senha   = document.getElementById('inp-senha').value;
+  const erroEl  = document.getElementById('login-erro');
+  const btnEl   = document.getElementById('btn-login-ok');
+  const loadEl  = document.getElementById('login-loading');
+  const inpU    = document.getElementById('inp-usuario');
+  const inpS    = document.getElementById('inp-senha');
+
+  // Limpa erros anteriores
+  erroEl.textContent = '';
+  inpU.classList.remove('erro');
+  inpS.classList.remove('erro');
+
+  // Valida credenciais
+  if (usuario !== CREDENCIAIS.usuario || senha !== CREDENCIAIS.senha) {
+    erroEl.textContent = '❌ Usuário ou senha incorretos. Tente novamente!';
+    inpU.classList.add('erro');
+    inpS.classList.add('erro');
+    inpS.value = '';
+    falar('Ops! Usuário ou senha errados!');
+    return;
+  }
+
+  // Mostra loading
+  btnEl.disabled = true;
+  loadEl.style.display = 'block';
+  falar('Entrando na cozinha, Lara!');
+
+  usuarioLogado = usuario;
+
+  // Tenta carregar do Supabase
+  if (SUPABASE_ON) {
+    document.getElementById('aviso-offline').style.display = 'none';
+    await carregarSupabase();
+  } else {
+    document.getElementById('aviso-offline').style.display = 'block';
+    carregarLocal();
+  }
+
+  btnEl.disabled = false;
+  loadEl.style.display = 'none';
+
+  atualizarUI();
+  ir('tela-splash');
+  // Splash por 1.5s depois vai para home
+  setTimeout(() => { ir('tela-home'); }, 1500);
+}
+
+function confirmarLogout() { abrirModal('m-logout'); }
+function fazerLogout() {
+  fecharModal('m-logout');
+  usuarioLogado = null;
+  G = { xp:0, streak:0, fase:1, missoesConcluidas:0, marcosDesbloqueados:[], ultimoDia:null, sessaoHoje:{feitas:[false,false,false],rotacao:0} };
+  document.getElementById('inp-usuario').value = '';
+  document.getElementById('inp-senha').value = '';
+  document.getElementById('login-erro').textContent = '';
+  ir('tela-login');
+}
+
+// ═══════════════════════════════════════════════
+// PERSISTÊNCIA — local + Supabase
+// ═══════════════════════════════════════════════
+
+// Converte estado do jogo para formato do banco
+function gParaBanco() {
+  return {
+    fase_atual: G.fase,
+    xp_total: G.xp,
+    sequencia_dias: G.streak,
+    ultima_atividade: G.ultimoDia,
+    missoes_concluidas: G.missoesConcluidas,
+    marcos_desbloqueados: G.marcosDesbloqueados,
+    sessoes_hoje: G.sessaoHoje
+  };
+}
+
+// Converte formato do banco para estado do jogo
+function bancoParaG(row) {
+  G.fase             = row.fase_atual ?? 1;
+  G.xp               = row.xp_total ?? 0;
+  G.streak           = row.sequencia_dias ?? 0;
+  G.ultimoDia        = row.ultima_atividade ?? null;
+  G.missoesConcluidas= row.missoes_concluidas ?? 0;
+  G.marcosDesbloqueados = row.marcos_desbloqueados ?? [];
+  G.sessaoHoje       = row.sessoes_hoje ?? { feitas:[false,false,false], rotacao:0 };
+}
+
+function processarNovoDia() {
+  const hoje = new Date().toDateString();
+  if (G.ultimoDia !== hoje) {
+    const ontem = new Date(); ontem.setDate(ontem.getDate()-1);
+    if (G.ultimoDia && G.ultimoDia !== ontem.toDateString() && G.ultimoDia !== hoje) G.streak = 0;
+    const rot = G.sessaoHoje?.rotacao || 0;
+    G.sessaoHoje = { feitas:[false,false,false], rotacao:(rot+1)%10 };
+    G.ultimoDia = hoje;
+  }
+}
+
+async function carregarSupabase() {
+  const row = await SB.buscar(usuarioLogado);
+  if (row) {
+    bancoParaG(row);
+  } else {
+    // Primeiro acesso: tenta migrar do localStorage
+    carregarLocal();
+    // Cria registro no Supabase
+    await SB.criar(usuarioLogado, gParaBanco());
+  }
+  processarNovoDia();
+  // Salva imediatamente para sincronizar novo dia
+  await salvar();
+}
+
+function carregarLocal() {
+  const s = localStorage.getItem('cml_g4');
+  if (s) { try { const d=JSON.parse(s); G={...G,...d}; } catch(e){} }
+  processarNovoDia();
+}
+
+async function salvar() {
+  // Sempre salva local como fallback
+  localStorage.setItem('cml_g4', JSON.stringify(G));
+  // Se Supabase configurado, sincroniza na nuvem
+  if (SUPABASE_ON && usuarioLogado) {
+    await SB.salvar(usuarioLogado, gParaBanco());
+  }
+}
+
+function carregar() {
+  // Função legada mantida — o carregamento real é feito no login
+  carregarLocal();
+}
+
+// ═══════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════
+function ir(id){ document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa')); document.getElementById(id).classList.add('ativa'); window.scrollTo(0,0); }
+function entrar(){ /* chamado pelo botão splash — login já fez tudo */ ir('tela-home'); }
+function voltarHome(){ fecharModal('m-volta'); fecharModal('m-dia-completo'); atualizarUI(); ir('tela-home'); }
+function abrirModal(id){ if(id==='m-streak') document.getElementById('m-streak-n').textContent=G.streak; document.getElementById(id).classList.add('ativo'); }
+function fecharModal(id){ document.getElementById(id).classList.remove('ativo'); }
+
+// ═══════════════════════════════════════════════
+// ATUALIZAR INTERFACE
+// ═══════════════════════════════════════════════
+function atualizarUI(){
+  const f = FASES_DEF[G.fase-1];
+  const pct = Math.min(100, ((G.xp-f.xpMin)/(f.xpMax-f.xpMin))*100);
+  document.getElementById('h-xp').textContent = G.xp+' XP';
+  document.getElementById('xp-fill').style.width = Math.max(0,pct)+'%';
+  document.getElementById('h-streak').textContent = G.streak;
+  const ch = CHAPEUS.filter(c=>c.xp<=G.xp).pop();
+  if(ch){ const t=`${ch.em} ${ch.nome}`; document.getElementById('h-chapeu').textContent=t; document.getElementById('p-titulo').textContent=t; }
+  renderReceitasHoje(); renderFases();
+  document.getElementById('p-xp').textContent=G.xp;
+  document.getElementById('p-streak').textContent=G.streak;
+  document.getElementById('p-miss').textContent=G.missoesConcluidas;
+  document.getElementById('p-marcos').textContent=G.marcosDesbloqueados.length;
+  renderChapeus(); renderMarcos();
+}
+function renderReceitasHoje(){
+  const fId = Math.min(G.fase, 2);
+  const mc = MISSOES_POR_FASE[fId];
+  const rot = G.sessaoHoje.rotacao;
+  document.getElementById('rec-card').innerHTML = mc.map((m,i)=>{
+    const feita = G.sessaoHoje.feitas[i];
+    return `<div class="miss-item ${feita?'concluida':''}" onclick="${feita?'':'iniciarMissao('+i+')'}">
+      <div class="miss-ic ${m.classe}">${m.ic}</div>
+      <div class="miss-info"><div class="miss-nome">${m.nome}</div><div class="miss-desc">${m.desc}</div><div class="miss-xp">+${m.xp}⭐ por questão certa</div></div>
+      <div class="miss-check ${feita?'ok':''}">${feita?'✓':''}</div>
+    </div>`;
+  }).join('');
+}
+function renderFases(){
+  const g = document.getElementById('fases-grid'); g.innerHTML='';
+  FASES_DEF.forEach(f=>{
+    const ok=G.xp>=f.xpMax, at=G.xp>=f.xpMin&&G.xp<f.xpMax, lock=G.xp<f.xpMin;
+    const pp = at?Math.round(((G.xp-f.xpMin)/(f.xpMax-f.xpMin))*100):ok?100:0;
+    const d=document.createElement('div');
+    d.className=`fase-card ${ok?'ok':''} ${at?'atual':''} ${lock?'lock':''}`;
+    d.innerHTML=`<div class="fase-st">${ok?'✅':at?'🌟':'🔒'}</div><div class="fase-ic">${f.ic}</div><div class="fase-num">Fase ${f.id} · ${f.sem}</div><div class="fase-nome">${f.nome}</div>${at?`<div class="fase-prog">${pp}% da fase</div>`:''}${lock?`<div class="fase-prog" style="color:#bbb">${f.xpMin}XP</div>`:''}`;
+    g.appendChild(d);
+  });
+}
+function renderChapeus(){
+  const g=document.getElementById('chap-grid'); g.innerHTML='';
+  CHAPEUS.forEach(c=>{ const ok=G.xp>=c.xp; const d=document.createElement('div'); d.className=`chap-c ${ok?'desbloq':'lock'}`; d.innerHTML=`<div class="chap-em">${c.em}</div><div class="chap-nm">${c.nome}</div><div style="font-size:10px;color:#aaa;font-weight:700">${ok?'✅ Ganho!':'🔒'+c.xp+'⭐'}</div>`; g.appendChild(d); });
+}
+function renderMarcos(){
+  const l=document.getElementById('marcos-lista'); l.innerHTML='';
+  MARCOS.forEach(m=>{ const got=G.marcosDesbloqueados.includes(m.id); const d=document.createElement('div'); d.className='marco-item'; d.innerHTML=`<div class="marco-dot ${got?'got':'next'}">${got?'🌟':'○'}</div><div class="marco-info"><div class="marco-tit">${m.tit}</div><div class="marco-dt">📅 ${m.dt} · ${m.desc}</div><div class="marco-st ${got?'ok':'pend'}">${got?'CONQUISTADO! ✓':'Em breve...'}</div></div>`; l.appendChild(d); });
+}
+
+// ═══════════════════════════════════════════════
+// MISSÕES
+// ═══════════════════════════════════════════════
+function iniciarMissao(slot){
+  if(G.sessaoHoje.feitas[slot]){ falar('Você já fez essa receita hoje!'); return; }
+  const fId=Math.min(G.fase,2), conf=MISSOES_POR_FASE[fId][slot], rot=G.sessaoHoje.rotacao;
+  const tipo = conf.tipos[rot%conf.tipos.length];
+  M={slot,tipo,questoes:[],qAtual:0,totalQ:5,xpGanho:0,tentativas:0};
+  document.getElementById('miss-xp').textContent=conf.xp;
+  document.getElementById('miss-prog').style.width='5%';
+  M.questoes=gerarQuestoes(tipo,fId,rot,5);
+  ir('tela-missao'); renderQuestaoAtual();
+}
+function gerarQuestoes(tipo,fId,rot,total){
+  let banco;
+  if(tipo==='detetive') banco=fId===1?DETETIVE_F1:[...DETETIVE_F1,...DETETIVE_F2];
+  else if(tipo==='silaba') banco=SILABAS_GRUPOS;
+  else if(tipo==='prato') banco=fId===1?PALAVRAS_F1:[...PALAVRAS_F1,...PALAVRAS_F2];
+  else if(tipo==='secreto') banco=SECRETO_F1;
+  else if(tipo==='frase') banco=fId===1?FRASES_F1:[...FRASES_F1,...FRASES_F2];
+  const seed=rot+new Date().getDate()+new Date().getMonth()*31;
+  return [...banco].sort((a,b)=>hash(JSON.stringify(a)+seed)-hash(JSON.stringify(b)+seed)).slice(0,Math.min(total,banco.length));
+}
+function hash(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))&0xffffffff; return h; }
+
+function renderQuestaoAtual(){
+  M.tentativas=0;
+  const q=M.questoes[M.qAtual];
+  const pct=Math.round((M.qAtual/M.totalQ)*100);
+  document.getElementById('miss-prog').style.width=Math.max(5,pct)+'%';
+  document.getElementById('q-counter').textContent=`Questão ${M.qAtual+1} de ${M.totalQ}`;
+  if(M.tipo==='detetive') renderDetetive(q);
+  else if(M.tipo==='silaba') renderSilaba(q);
+  else if(M.tipo==='prato') renderPrato(q);
+  else if(M.tipo==='secreto') renderSecreto(q);
+  else if(M.tipo==='frase') renderFrase(q);
+}
+function proximaQuestao(xp){
+  const fId=Math.min(G.fase,2);
+  M.xpGanho+=xp; M.qAtual++;
+  if(M.qAtual>=M.totalQ){
+    G.xp+=M.xpGanho; G.missoesConcluidas++; G.sessaoHoje.feitas[M.slot]=true;
+    const hoje=new Date().toDateString();
+    if(G.ultimoDia!==hoje||G.streak===0){ G.streak++; G.ultimoDia=hoje; }
+    verificarMarcos(); verificarFase();
+    salvar(); // async — Supabase atualiza em background
+    mostrarCelebracao(M.xpGanho);
+    return;
+  }
+  setTimeout(renderQuestaoAtual,300);
+}
+function verificarMarcos(){
+  [[1,20],[2,100],[3,200],[4,500]].forEach(([id,xpReq])=>{ if(G.xp>=xpReq&&!G.marcosDesbloqueados.includes(id)) G.marcosDesbloqueados.push(id); });
+}
+function verificarFase(){
+  const antes=G.fase;
+  for(let i=FASES_DEF.length-1;i>=0;i--){ if(G.xp>=FASES_DEF[i].xpMin){ G.fase=FASES_DEF[i].id; break; } }
+  if(G.fase>antes){ const f=FASES_DEF[G.fase-1]; document.getElementById('mfn-em').textContent=f.ic; document.getElementById('mfn-titulo').textContent=`Fase ${G.fase} Desbloqueada!`; document.getElementById('mfn-txt').textContent=`Parabéns! Você entrou na estação "${f.nome}"!`; setTimeout(()=>abrirModal('m-fase-nova'),2500); }
+}
+
+// ═══════════════════════════════════════════════
+// ATIVIDADE 1: CHEF DETETIVE
+// ═══════════════════════════════════════════════
+function renderDetetive(q){
+  const ops=[...q.ops].sort(()=>Math.random()-.5);
+  document.getElementById('at-area').innerHTML=`
+    <div class="pers-reacao"><div class="pers-reacao-av">👨‍🍳</div><div class="pers-fala" id="pr-fala">Ouça com atenção! 👂</div></div>
+    <div class="at-titulo">👮 Chef Detetive</div>
+    <div class="at-inst">Ouça a palavra e toque na imagem certa!</div>
+    <button class="audio-btn" onclick="falar('${q.w}')">🔊 Ouvir: <strong>${q.w}</strong></button>
+    <div class="opcoes-grid">${ops.map((op,i)=>`<div class="op-card" onclick="respDetetive(this,${op.c},'${op.l}')"><div class="op-em">${op.em}</div><div class="op-lbl">${op.l}</div></div>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  setTimeout(()=>falar(q.w),700);
+}
+function respDetetive(el,correta,label){
+  if(el.classList.contains('off')) return;
+  M.tentativas++;
+  if(correta){
+    el.classList.add('correta');
+    document.querySelectorAll('.op-card').forEach(c=>c.classList.add('off'));
+    setFeedback('🎉 Isso mesmo! '+label+'!',true); setPersReacao('Que incrível! 🎉');
+    const xp=MISSOES_POR_FASE[Math.min(G.fase,2)][M.slot].xp;
+    setTimeout(()=>proximaQuestao(xp),1200);
+  } else {
+    el.classList.add('errada','off'); M.tentativas++;
+    if(M.tentativas>=3){ document.querySelectorAll('.op-card').forEach(c=>c.classList.add('off')); setFeedback('💪 A certa era outra. Próxima!',false); setTimeout(()=>proximaQuestao(0),1500); }
+    else { setFeedback(`🤔 Tente de novo! (${3-M.tentativas} tentativas)`,false); setPersReacao('Você consegue! 💪'); }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ATIVIDADE 2: SÍLABA MÁGICA
+// ═══════════════════════════════════════════════
+let _cons=null,_vog=null;
+function renderSilaba(grupo){
+  _cons=null; _vog=null;
+  const outros=SILABAS_GRUPOS.filter(g=>g.cons!==grupo.cons).sort(()=>Math.random()-.5).slice(0,3);
+  const cons4=[grupo,...outros].sort(()=>Math.random()-.5);
+  document.getElementById('at-area').innerHTML=`
+    <div class="pers-reacao"><div class="pers-reacao-av">👩‍🍳</div><div class="pers-fala" id="pr-fala">Misture os ingredientes! 🥣</div></div>
+    <div class="at-titulo">🥣 Sílaba Mágica</div>
+    <div class="at-inst">Toque numa consoante, depois numa vogal!</div>
+    <div class="silaba-area">
+      <div class="cons-grid">${cons4.map(g=>`<div class="letra-ing" id="ci-${g.cons}" style="background:linear-gradient(135deg,${g.cor},${g.cor}AA)" onclick="selCons('${g.cons}','${g.cor}')">${g.cons}</div>`).join('')}</div>
+      <div class="tigela-wrap"><div class="tigela-lbl">🍲 A Tigela Mágica</div><div class="tigela" id="tigela">🥣</div>
+        <div class="vogais-row">${['A','E','I','O','U'].map(v=>`<button class="vog-btn" id="vb-${v}" onclick="selVog('${v}')">${v}</button>`).join('')}</div>
+      </div>
+      <div class="feedback" id="fb"></div>
+      <button class="btn-conf" id="btn-mix" onclick="misturar('${grupo.cons}')" disabled>🌀 Misturar!</button>
+    </div>`;
+}
+function selCons(c){
+  document.querySelectorAll('.letra-ing').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('ci-'+c).classList.add('sel'); _cons=c; falar(c); checkMix();
+}
+function selVog(v){
+  document.querySelectorAll('.vog-btn').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('vb-'+v).classList.add('sel'); _vog=v; falar(v); checkMix();
+}
+function checkMix(){ const b=document.getElementById('btn-mix'); if(b) b.disabled=!(_cons&&_vog); }
+function misturar(consCorreta){
+  if(!_cons||!_vog) return;
+  const silaba=_cons+_vog, ok=_cons===consCorreta;
+  const tig=document.getElementById('tigela');
+  tig.innerHTML=`<div class="tigela-result">${silaba}</div>`;
+  tig.style.background=ok?'linear-gradient(180deg,#C8E6C9,#A5D6A7)':'linear-gradient(180deg,#FCE4EC,#F48FB1)';
+  falar(silaba);
+  if(ok){
+    setFeedback(`✨ ${silaba}! Que mistura deliciosa!`,true); setPersReacao('Perfeito! ✨');
+    const xp=MISSOES_POR_FASE[Math.min(G.fase,2)][M.slot].xp;
+    setTimeout(()=>proximaQuestao(xp),1400);
+  } else {
+    setFeedback(`🤔 Ops! Tente com a consoante ${consCorreta}!`,false);
+    M.tentativas++;
+    if(M.tentativas>=3){ setTimeout(()=>proximaQuestao(0),1600); return; }
+    setTimeout(()=>{ _cons=null;_vog=null; tig.innerHTML='🥣'; tig.style.background=''; document.querySelectorAll('.letra-ing').forEach(e=>e.classList.remove('sel')); document.querySelectorAll('.vog-btn').forEach(e=>e.classList.remove('sel')); document.getElementById('btn-mix').disabled=true; document.getElementById('fb').textContent=''; },1500);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ATIVIDADE 3: PALAVRAS NO PRATO
+// ═══════════════════════════════════════════════
+let _sils=[];
+function renderPrato(d){
+  _sils=[];
+  const todas=[...d.sils,...d.dist].sort(()=>Math.random()-.5);
+  const cores=['#FF8C00','#4CAF82','#5BBDE4','#FF6B9D','#9B59B6','#FFD700'];
+  document.getElementById('at-area').innerHTML=`
+    <div class="pers-reacao"><div class="pers-reacao-av">👦</div><div class="pers-fala" id="pr-fala">Monte o prato, Lara! 🍽️</div></div>
+    <div class="at-titulo">🍽️ Palavras no Prato</div>
+    <div class="at-inst">Toque nas sílabas na ordem certa!</div>
+    <div class="prato-area">
+      <div class="pal-img">${d.em}</div>
+      <div class="prato" id="prato"><span class="prato-vazio">Toque nas sílabas ⬇️</span></div>
+      <div class="sil-disp" id="sil-disp">${todas.map((s,i)=>`<button class="sil-btn" id="sb-${i}" style="background:${cores[i%cores.length]};color:#fff" onclick="addSil('${s}',${i},'${cores[i%cores.length]}')">${s}</button>`).join('')}</div>
+      <div class="feedback" id="fb"></div>
+      <div style="display:flex;gap:8px;width:100%;max-width:min(300px,90vw);margin-top:10px">
+        <button class="btn-conf sec" onclick="limparPrato()" style="flex:1">🗑️ Limpar</button>
+        <button class="btn-conf" onclick="verificarPrato('${d.pal}','${d.sils.join(',')}')" style="flex:2">✅ Conferir!</button>
+      </div>
+    </div>`;
+}
+function addSil(s,idx,cor){
+  const btn=document.getElementById('sb-'+idx);
+  if(!btn||btn.classList.contains('usada')) return;
+  btn.classList.add('usada'); _sils.push({s,idx,cor});
+  const prato=document.getElementById('prato');
+  if(_sils.length===1) prato.innerHTML='';
+  const sp=document.createElement('div'); sp.className='sil-prato'; sp.style.background=cor; sp.textContent=s; prato.appendChild(sp); falar(s);
+}
+function limparPrato(){ _sils=[]; document.querySelectorAll('.sil-btn').forEach(b=>b.classList.remove('usada')); document.getElementById('prato').innerHTML='<span class="prato-vazio">Toque nas sílabas ⬇️</span>'; document.getElementById('fb').textContent=''; }
+function verificarPrato(pal,silsStr){
+  if(_sils.length===0){ setFeedback('📢 Adicione sílabas!',false); return; }
+  const montada=_sils.map(x=>x.s).join('');
+  if(montada===pal){
+    setFeedback('🎉 Perfeito! '+pal+'!',true); setPersReacao('Que chef incrível! 🎉'); falar(pal);
+    const xp=MISSOES_POR_FASE[Math.min(G.fase,2)][M.slot].xp;
+    setTimeout(()=>proximaQuestao(xp),1400);
+  } else {
+    M.tentativas++;
+    if(M.tentativas>=3){ setFeedback(`💪 Era: ${silsStr.split(',').join(' + ')} = ${pal}`,false); setTimeout(()=>proximaQuestao(0),2000); }
+    else { setFeedback(`🤔 A ordem não está certa! (${3-M.tentativas} tentativas)`,false); setTimeout(limparPrato,1200); }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ATIVIDADE 4: INGREDIENTE SECRETO
+// ═══════════════════════════════════════════════
+function renderSecreto(d){
+  const opsCores=['#FF8C00','#4CAF82','#5BBDE4','#FF6B9D'];
+  const ops=[...d.ops].sort(()=>Math.random()-.5);
+  const partesHTML=d.partes.map(p=>{
+    if(p.startsWith('_')) return `<div class="sil-show" style="display:flex;align-items:center;gap:2px"><div class="lacuna-box" id="lacuna-el">__</div><span>${p.slice(1)}</span></div>`;
+    if(p.endsWith('_')) return `<div class="sil-show" style="display:flex;align-items:center;gap:2px"><span>${p.slice(0,-1)}</span><div class="lacuna-box" id="lacuna-el">__</div></div>`;
+    return `<div class="sil-show">${p}</div>`;
+  }).join('<span style="font-size:clamp(20px,5.5vw,28px);font-weight:900">·</span>');
+  document.getElementById('at-area').innerHTML=`
+    <div class="pers-reacao"><div class="pers-reacao-av">👧</div><div class="pers-fala" id="pr-fala">Qual ingrediente falta? 🔎</div></div>
+    <div class="at-titulo">🔎 Ingrediente Secreto</div>
+    <div class="at-inst">Qual LETRA está faltando na palavra?</div>
+    <div class="secret-area">
+      <div class="pal-hint-img">${d.em}</div>
+      <div class="lacuna-row">${partesHTML}</div>
+      <div class="letras-grid">${ops.map((op,i)=>`<button class="letra-op" id="lo-${i}" style="background:${opsCores[i%opsCores.length]};color:#fff" onclick="respSecreto(this,'${op}','${d.lacuna}')">${op}</button>`).join('')}</div>
+      <div class="feedback" id="fb"></div>
+    </div>`;
+}
+function respSecreto(el,letra,correta){
+  if(el.classList.contains('off')) return;
+  M.tentativas++;
+  const lac=document.getElementById('lacuna-el');
+  if(letra===correta){
+    el.classList.add('correta'); if(lac){lac.textContent=letra;lac.classList.add('prench');}
+    document.querySelectorAll('.letra-op').forEach(e=>e.classList.add('off'));
+    setFeedback('🎉 A letra é '+letra+'! Muito bem!',true); setPersReacao('Brilhante! ✨'); falar(letra);
+    const xp=MISSOES_POR_FASE[Math.min(G.fase,2)][M.slot].xp;
+    setTimeout(()=>proximaQuestao(xp),1300);
+  } else {
+    el.classList.add('errada','off');
+    if(M.tentativas>=3){ document.querySelectorAll('.letra-op').forEach(e=>{if(e.textContent.trim()===correta)e.classList.add('correta');else e.classList.add('off');}); if(lac){lac.textContent=correta;lac.classList.add('prench');} setFeedback('💪 Era '+correta+'! Próxima!',false); setTimeout(()=>proximaQuestao(0),1500); }
+    else setFeedback(`🤔 Tente outra! (${3-M.tentativas} tentativas)`,false);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ATIVIDADE 5: COMPLETE A RECEITA
+// ═══════════════════════════════════════════════
+function renderFrase(d){
+  const ops=[...d.ops].sort(()=>Math.random()-.5);
+  const fraseHTML=d.frase.replace('___','<span class="lacuna-inline" id="lac">___</span>');
+  document.getElementById('at-area').innerHTML=`
+    <div class="pers-reacao"><div class="pers-reacao-av">👩‍🍳</div><div class="pers-fala" id="pr-fala">Complete a receita! 📝</div></div>
+    <div class="at-titulo">📝 Complete a Receita</div>
+    <div class="at-inst">Qual palavra completa a frase?</div>
+    <div class="frase-area">
+      <div class="frase-display">${fraseHTML}</div>
+      <div class="opcoes-frase">${ops.map(op=>`<div class="op-frase" onclick="respFrase(this,'${op}','${d.lacuna}')">${op}</div>`).join('')}</div>
+      <div class="feedback" id="fb"></div>
+    </div>`;
+  falar(d.frase.replace('___','...'));
+}
+function respFrase(el,op,correta){
+  if(el.classList.contains('off')) return;
+  M.tentativas++;
+  const lac=document.getElementById('lac');
+  if(op===correta){
+    el.classList.add('correta'); if(lac){lac.textContent=correta;lac.classList.add('prench');}
+    document.querySelectorAll('.op-frase').forEach(e=>e.classList.add('off'));
+    setFeedback('🎉 Perfeito! "'+correta+'" é a certa!',true); setPersReacao('Que inteligente! 🌟'); falar(correta);
+    const xp=MISSOES_POR_FASE[Math.min(G.fase,2)][M.slot].xp;
+    setTimeout(()=>proximaQuestao(xp),1400);
+  } else {
+    el.classList.add('errada','off');
+    if(M.tentativas>=3){ document.querySelectorAll('.op-frase').forEach(e=>{if(e.textContent===correta)e.classList.add('correta');else e.classList.add('off');}); if(lac){lac.textContent=correta;lac.classList.add('prench');} setFeedback('💪 Era "'+correta+'"! Próxima!',false); setTimeout(()=>proximaQuestao(0),1600); }
+    else setFeedback(`🤔 Tente outra opção! (${3-M.tentativas} tentativas)`,false);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function setFeedback(txt,ok){ const e=document.getElementById('fb'); if(!e) return; e.textContent=txt; e.className='feedback '+(ok?'ok':'err'); }
+function setPersReacao(txt){ const e=document.getElementById('pr-fala'); if(e) e.textContent=txt; }
+
+// ═══════════════════════════════════════════════
+// CELEBRAÇÃO
+// ═══════════════════════════════════════════════
+const FRASES_CEL=[
+  {msg:'O Pai Winison ficou super orgulhoso! 👨‍🍳💛',em:'🎉'},
+  {msg:'A Mãe Luana tá dançando de alegria! 👩‍🍳🌸',em:'🌟'},
+  {msg:'O Pedro gritou: Boa, Lara!! 👦🎊',em:'👏'},
+  {msg:'A Laisa quer ser chef igual a você! 👧✨',em:'✨'},
+  {msg:'A Geovana ficou com ciúmes do seu talento! 😄',em:'🎊'},
+  {msg:'A Laura diz: Incrível, Lara! 👶💫',em:'💫'},
+];
+function mostrarCelebracao(xp){
+  const c=FRASES_CEL[Math.floor(Math.random()*FRASES_CEL.length)];
+  document.getElementById('cel-em').textContent=c.em;
+  document.getElementById('cel-titulo').textContent='Atividade completa! 🎉';
+  document.getElementById('cel-msg').textContent=c.msg;
+  document.getElementById('cel-xp').textContent=`+${xp} ⭐ Estrelas de Chef!`;
+  lancarConfetes(); falar('Parabéns, Lara! Você é incrível!'); ir('tela-celebracao');
+  if(G.sessaoHoje.feitas.every(Boolean)) setTimeout(()=>abrirModal('m-dia-completo'),2000);
+}
+function lancarConfetes(){
+  const c=document.getElementById('confetti'); c.innerHTML='';
+  const em=['🌟','⭐','🎉','🎊','✨','🍳','🥄','👩‍🍳','🎈','💛','🌈'];
+  for(let i=0;i<22;i++){ const p=document.createElement('div'); p.className='confetti-p'; p.textContent=em[Math.floor(Math.random()*em.length)]; p.style.left=Math.random()*100+'vw'; p.style.animationDuration=(2+Math.random()*2)+'s'; p.style.animationDelay=Math.random()*1.5+'s'; c.appendChild(p); }
+}
+
+// ═══════════════════════════════════════════════
+// VOZ — Web Speech API PT-BR
+// ═══════════════════════════════════════════════
+function falar(txt){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang='pt-BR'; u.rate=0.82; u.pitch=1.1; u.volume=1;
+  const vs=window.speechSynthesis.getVoices();
+  const voz=vs.find(v=>v.lang.startsWith('pt')&&v.name.toLowerCase().includes('female'))||vs.find(v=>v.lang.startsWith('pt-BR'))||vs.find(v=>v.lang.startsWith('pt'));
+  if(voz) u.voice=voz;
+  window.speechSynthesis.speak(u);
+}
+if(window.speechSynthesis) window.speechSynthesis.onvoiceschanged=()=>{};
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  // Saudação na tela de login
+  setTimeout(()=>falar('Olá! Entre com seu usuário e senha!'), 600);
+  // Foca no campo de usuário
+  setTimeout(()=>{ const el=document.getElementById('inp-usuario'); if(el) el.focus(); }, 400);
+});
+</script>
+<!--
+╔══════════════════════════════════════════════════════╗
+║  PRÓXIMOS PASSOS — Pai Winison                        ║
+╠══════════════════════════════════════════════════════╣
+║  ADICIONAR CONTEÚDO:                                  ║
+║  • Adicione itens em DETETIVE_F1, PALAVRAS_F1 etc.    ║
+║  • Para Fase 3, crie arrays _F3 e adicione em         ║
+║    MISSOES_POR_FASE com chave "3"                     ║
+║                                                      ║
+║  O QUE FOI CORRIGIDO NA V3:                           ║
+║  ✅ Tipografia fluida com clamp() — escala entre      ║
+║     320px (iPhone SE) e 768px+ (iPad)                 ║
+║  ✅ env(safe-area-inset-bottom) — nav não some        ║
+║     atrás do home indicator do iPhone                 ║
+║  ✅ min-height: 56px em todos os botões tocáveis      ║
+║  ✅ 100dvh — usa altura real no mobile                ║
+║  ✅ overflow-y: auto + -webkit-overflow-scrolling     ║
+║     nas áreas com scroll (atividades longas)          ║
+║  ✅ Breakpoints: < 360px, 600px, 768px+               ║
+║  ✅ max-width: min(Xpx, 95vw) garante padding         ║
+║     lateral em qualquer tela                          ║
+║  ✅ Grid adaptativo nas opções do Detetive            ║
+║  ✅ No tablet largo (768px+): conteúdo centralizado   ║
+║     com max-width:640px — parece app nativo           ║
+╚══════════════════════════════════════════════════════╝
+-->
+</body>
+</html>
