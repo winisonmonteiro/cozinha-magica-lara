@@ -1,0 +1,14 @@
+﻿metrica;valor;observacao
+Contratacoes (total na base);2607.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Itens totais armazenados;11221.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Itens novos recuperados nesta sessao (paginacao real);0.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Itens ACEITOS (apos reclassificacao v2);223.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Itens ACEITOS antes da reclassificacao (v1, referencia);268.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Itens retirados do escopo (ACEITO->outro);73.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Itens recuperados de EXCLUIDO/QUARENTENA para ACEITO;28.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Resultados armazenados;200.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Resultados com cancelamento corrigido nesta sessao;1.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Valor homologado elegivel (pos-correcao);1831999.522;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Contratacoes com paginacao de itens COMPROVADAMENTE completa;0.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Contratacoes com paginacao de itens PENDENTE (completude nao comprovada);2607.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.
+Contratacoes com suspeita de truncamento (exatamente 10 itens, alta prioridade);696.0;Diferencas de valor entre versoes decorrem de correcoes de classificacao/cancelamento e complementacao de dados, NAO de variacao real do mercado.

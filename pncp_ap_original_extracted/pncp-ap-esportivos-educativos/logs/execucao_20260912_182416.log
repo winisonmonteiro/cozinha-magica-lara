@@ -1,0 +1,15 @@
+=== Fase 1: publicacoes (2025-01-01 a 2026-09-12, modalidades [6, 7, 8]) ===
+  [publicacoes] mod=6 janela=2025-01-01..2025-01-07 pagina=1/1 registros_pagina=9
+  [publicacoes] mod=6 janela=2025-01-08..2025-01-14 pagina=1/1 registros_pagina=14
+  [publicacoes] mod=6 janela=2025-01-15..2025-01-21 pagina=1/1 registros_pagina=15
+  [publicacoes] mod=6 janela=2025-01-22..2025-01-28 pagina=1/1 registros_pagina=13
+  [publicacoes] mod=6 janela=2025-01-29..2025-02-04 pagina=1/1 registros_pagina=12
+  [publicacoes] mod=6 janela=2025-02-05..2025-02-11 pagina=1/1 registros_pagina=10
+  [publicacoes] mod=6 janela=2025-02-12..2025-02-18 pagina=1/1 registros_pagina=16
+  [publicacoes] mod=6 janela=2025-02-19..2025-02-25 pagina=1/1 registros_pagina=10
+  [publicacoes] mod=6 janela=2025-02-26..2025-03-04 pagina=1/1 registros_pagina=12
+  [publicacoes] mod=6 janela=2025-03-05..2025-03-11 pagina=1/1 registros_pagina=9
+  [publicacoes] mod=6 janela=2025-03-12..2025-03-18 pagina=1/1 registros_pagina=12
+  [publicacoes] mod=6 janela=2025-03-19..2025-03-25 pagina=1/1 registros_pagina=7
+  [publicacoes] mod=6 janela=2025-03-26..2025-04-01 pagina=1/1 registros_pagina=24
+  [ritmo] pausa global ativa por 429; aguardando 60s

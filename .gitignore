@@ -1,0 +1,11 @@
+# Backups e arquivos redundantes gerados durante a complementacao PNCP
+# (conteudo ja preservado em pncp_ap_original_extracted/ e pncp_ap_complementado/)
+backup_original/
+pncp-ap-esportivos-educativos.zip
+pncp_ap_complementado.zip
+
+# Artefatos Python/SQLite transitorios
+__pycache__/
+*.pyc
+*.sqlite-wal
+*.sqlite-shm

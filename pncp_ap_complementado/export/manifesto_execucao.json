@@ -1,0 +1,41 @@
+{
+  "versao_script": "8.0-corrigido",
+  "versao_classificacao": "v2",
+  "gerado_em": "2026-09-13T01:39:30.751373",
+  "periodo_configurado": {
+    "inicio": "2025-01-01",
+    "fim_desta_complementacao": "2026-09-12"
+  },
+  "ambiente": {
+    "rede_pncp_disponivel": false,
+    "observacao": "Acesso de rede a pncp.gov.br bloqueado pela politica de egress deste ambiente (403 no CONNECT, confirmado via proxy). Paginacao de itens e complementacao de resultados NAO puderam ser executadas contra a API real nesta sessao. Codigo corrigido e testado com mocks; comando de retomada no manifesto."
+  },
+  "periodo_efetivamente_coberto": {
+    "janelas_concluidas": 181,
+    "janelas_sem_registros": 86,
+    "janelas_falha": 0,
+    "janelas_totais_registradas": 267,
+    "cobertura_publicacoes_verificada_sem_lacunas": true
+  },
+  "contagens": {
+    "contratacoes": 2607,
+    "contratacoes_estadual_municipal": 1472,
+    "itens": 11221,
+    "itens_aceitos": 223,
+    "itens_quarentena": 58,
+    "itens_excluidos": 10940,
+    "resultados": 200,
+    "contratacoes_com_paginacao_comprovadamente_completa": 0,
+    "contratacoes_com_suspeita_de_truncamento_alta_prioridade": 696
+  },
+  "comando_de_retomada": "cd pncp_ap_complementado/code && python pncp_ap_collector.py --recuperar-itens --time-budget-min 120  # prioriza as 696 contratacoes com suspeita de truncamento; python pncp_ap_collector.py --recuperar-resultados --time-budget-min 60  # depois de recuperar itens; python pncp_ap_collector.py --export  # gera CSVs/Excel novamente apos a coleta",
+  "limitacoes": [
+    "Paginacao real de itens e complementacao de resultados nao executadas nesta sessao (sem rede); base entregue e PARCIAL quanto a completude de itens -- ver cobertura.csv e pendencias.csv.",
+    "Atas, contratos, empenhos, pagamentos e concorrentes nao sao coletados nesta versao.",
+    "srp=true identifica o procedimento, nao comprova ata assinada nem consumo.",
+    "CR4/HHI calculados apenas sobre o universo efetivamente coletado ate o momento da exportacao, separadamente para AP_ESTADUAL_MUNICIPAL e AP_TODAS_ESFERAS (nunca somados).",
+    "Precos com n_observacoes=1 nao devem ser tratados como referencia robusta de mercado.",
+    "Sazonalidade 'todas_compras_consultadas' cobre todas as esferas e nao deve ser usada como indicador do setor esportivo/educativo; usar o recorte 'rol_esportivo_educativo' para isso.",
+    "Classificacao de itens e regra textual versionada (v2); quarentena requer revisao manual."
+  ]
+}

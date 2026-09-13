@@ -1,0 +1,30 @@
+{
+  "versao_script": "7.0",
+  "gerado_em": "2026-09-12T20:30:29.487400",
+  "periodo_configurado": {
+    "inicio": "2025-01-01",
+    "fim_limite": "2026-12-31"
+  },
+  "periodo_efetivamente_coberto": {
+    "janelas_concluidas": 181,
+    "janelas_sem_registros": 86,
+    "janelas_falha": 0,
+    "janelas_totais_registradas": 267
+  },
+  "contagens": {
+    "contratacoes": 2607,
+    "contratacoes_estadual_municipal": 1472,
+    "itens": 11221,
+    "itens_aceitos": 268,
+    "itens_quarentena": 12,
+    "itens_excluidos": 10941,
+    "resultados": 200
+  },
+  "limitacoes": [
+    "Atas, contratos, empenhos, pagamentos e concorrentes nao sao coletados nesta versao.",
+    "srp=true identifica o procedimento, nao comprova ata assinada nem consumo.",
+    "CR4/HHI calculados apenas sobre o universo efetivamente coletado ate o momento da exportacao.",
+    "Precos com n_observacoes=1 nao devem ser tratados como referencia robusta de mercado.",
+    "Classificacao de itens e regra textual versionada (v1), sujeita a revisao manual da quarentena."
+  ]
+}

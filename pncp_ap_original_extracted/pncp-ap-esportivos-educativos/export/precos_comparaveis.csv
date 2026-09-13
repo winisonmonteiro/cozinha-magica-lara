@@ -1,0 +1,133 @@
+﻿produto_id;unidade_normalizada;tipo_preco;minimo;media;mediana;maximo;n_observacoes;n_contratacoes;aviso
+E01;unidade;estimado;208.1;217.93666666666664;208.1;237.61;3;3;
+E02;1 Un.;estimado;138.5;151.6;151.6;164.7;2;1;
+E02;unidade;estimado;127.54;166.76333333333335;155.8;216.95;3;3;
+E03;1 Un.;estimado;125.95;252.725;252.725;379.5;2;2;
+E03;und 1 Un.;estimado;660.19;660.19;660.19;660.19;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E03;unidade;estimado;120.33;316.143076923077;199.0;900.0;13;8;
+E04;1 Un.;estimado;267.3;333.4;333.4;399.5;2;1;
+E04;unidade;estimado;172.0;258.9244444444444;197.91;514.6;9;8;
+E05;unidade;estimado;140.05;169.6502;147.41;214.15;5;3;
+E06;par;estimado;592.58;592.58;592.58;592.58;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E07;jogo;estimado;132.57;132.57;132.57;132.57;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E07;unidade;estimado;359.72;420.275;420.275;480.83;2;2;
+E09;Ind 1 un;estimado;25.0;25.0;25.0;25.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E10;Ind 1 un;estimado;20.5;75.61333333333333;92.15;114.19;3;3;
+E10;Kit 10 Un;estimado;6.0;17.9975;9.495000000000001;47.0;4;4;
+E10;unidade;estimado;10.76;87.72333333333334;75.925;179.0;6;4;
+E12;1 Un.;estimado;89.81;89.81;89.81;89.81;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E12;Ind 1 un;estimado;6.78;113.39;113.39;220.0;2;2;
+E12;UNID;estimado;70.0;70.0;70.0;70.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E12;unidade;estimado;17.1;29123.825454545455;34.88;320000.0;11;9;
+E13;Ind - 1 - un;estimado;64.37;64.37;64.37;64.37;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E13;unidade;estimado;40.54;131.185;74.3;335.6;4;4;
+E14;unidade;estimado;51.0;51.0;51.0;51.0;2;2;
+E15;Ind - 1 - unidade;estimado;410.0;410.0;410.0;410.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E15;unidade;estimado;0.0;113.774;78.56;305.0;5;5;
+E16;Ind 1 un;estimado;19.9;19.9;19.9;19.9;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E17;unidade;estimado;128.36;250.18;250.18;372.0;2;2;
+E20;unidade;estimado;1480.26;1480.26;1480.26;1480.26;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E21;Quilo;estimado;25.06;25.06;25.06;25.06;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E21;unidade;estimado;782.0;782.0;782.0;782.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E22;Ind 1 un;estimado;77.22;77.22;77.22;77.22;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E22;adesivo;estimado;309.5;309.5;309.5;309.5;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E22;unidade;estimado;0.0;741.3866666666667;460.665;2632.64;6;5;
+E23;1 Un.;estimado;374.5;374.5;374.5;374.5;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E23;Ind 1 un;estimado;198.0;216.8235294117647;198.0;385.0;34;6;
+E23;unidade;estimado;0.0;987.2090000000001;12.855;8091.0;10;7;
+E24;Embalagem 250 G;estimado;4.5;4.5;4.5;4.5;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E24;unidade;estimado;9.26;19.006666666666664;16.22;31.54;3;3;
+P01;1 Un.;estimado;257.4;257.4;257.4;257.4;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;BL;estimado;53.33;53.33;53.33;53.33;5;1;
+P01;BLC;estimado;43.33;43.33;43.33;43.33;5;1;
+P01;Cx 10 Resmas;estimado;245.0;245.0;245.0;245.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;Ind 1 Resma;estimado;19.21;19.21;19.21;19.21;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;Ind 1 un;estimado;14.98;14.98;14.98;14.98;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;Pct. 5 Uns.;estimado;5.13;5.13;5.13;5.13;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;unidade;estimado;20.0;43.14666666666667;54.72;54.72;3;3;
+P02;unidade;estimado;18.79;24.938866666666666;23.8;32.2266;3;3;
+P03;unidade;estimado;4.94;4.94;4.94;4.94;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P04;Caixa 24,00 UN;estimado;16.23;16.23;16.23;16.23;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P04;Cx 12 un;estimado;11.0;11.0;11.0;11.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P04;unidade;estimado;2.6866;2.6866;2.6866;2.6866;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P05;Caixa 12,00 UN;estimado;30.71;30.71;30.71;30.71;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P05;Cx 72 Un;estimado;75.0;75.0;75.0;75.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P06;CX;estimado;38.0;39.325;39.325;40.65;2;1;
+P06;Caixa 12,00 UN;estimado;50.03;50.03;50.03;50.03;3;1;
+P06;Caixa 50 UN;estimado;0.0;38.991333333333344;36.17;64.97;15;7;
+P06;Caixa 50,00 UN;estimado;29.651;48.42728181818182;40.0;123.83;11;6;
+P06;Cx 50 Un.;estimado;0.0;35.01777777777778;37.63;57.51;9;6;
+P06;Cx 50 Unds;estimado;29.02;29.26666666666667;29.18;29.6;3;1;
+P06;unidade;estimado;0.0;594.2449476190476;1.0733;12441.0;21;15;
+P07;unidade;estimado;0.68;0.68;0.68;0.68;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P10;Caixa 6,00 UN;estimado;6.62;6.62;6.62;6.62;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P12;unidade;estimado;16.88;16.88;16.88;16.88;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P14;Ind 1 un;estimado;6.3;6.3;6.3;6.3;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P15;Caixa 1000 UN;estimado;1560.0;1560.0;1560.0;1560.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P15;folha;estimado;0.94;0.94;0.94;0.94;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P15;unidade;estimado;0.9;1.8275000000000001;2.25;2.25;8;3;
+P16;unidade;estimado;590030.33;590030.33;590030.33;590030.33;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P19;UNID.;estimado;8.5933;9.159433333333332;8.9775;9.9075;3;3;
+P19;unidade;estimado;4.28;49.86444444444444;14.67;259.7;9;9;
+P21;unidade;estimado;83.7;83.7;83.7;83.7;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E01;unidade;homologado;172.0;191.1;200.0;201.3;3;3;
+E02;unidade;homologado;60.0;124.92;100.0;214.76;3;3;
+E03;1 Un.;homologado;90.0;90.0;90.0;90.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E03;unidade;homologado;52.0;183.0525;124.535;500.66;12;7;
+E04;unidade;homologado;49.5;182.51444444444442;137.72;382.0;9;8;
+E05;unidade;homologado;60.0;117.928;120.13;147.41;5;3;
+E06;par;homologado;417.0;417.0;417.0;417.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E07;jogo;homologado;74.05;74.05;74.05;74.05;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E07;unidade;homologado;263.0;263.0;263.0;263.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E09;Ind 1 un;homologado;20.0;20.0;20.0;20.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E10;Ind 1 un;homologado;18.0;58.945;58.945;99.89;2;2;
+E10;Kit 10 Un;homologado;5.89;5.89;5.89;5.89;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E10;unidade;homologado;10.76;94.88;94.88;179.0;2;2;
+E12;Ind 1 un;homologado;6.78;6.78;6.78;6.78;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E12;UNID;homologado;65.0;65.0;65.0;65.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E12;unidade;homologado;12.0;31.283000000000005;28.0;77.0;10;8;
+E13;unidade;homologado;40.54;126.985;69.3;328.8;4;4;
+E14;unidade;homologado;47.2;56.1;56.1;65.0;2;2;
+E15;Ind - 1 - unidade;homologado;243.0;243.0;243.0;243.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E15;unidade;homologado;34.0;84.00666666666667;78.56;139.46;3;3;
+E16;Ind 1 un;homologado;18.0;18.0;18.0;18.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E17;unidade;homologado;128.06;177.29500000000002;177.29500000000002;226.53;2;2;
+E20;unidade;homologado;0.0;740.0;740.0;1480.0;2;1;
+E21;unidade;homologado;780.881;780.881;780.881;780.881;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E22;Ind 1 un;homologado;77.0;77.0;77.0;77.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E22;unidade;homologado;665.33;1270.8325;1075.0;2268.0;4;3;
+E23;1 Un.;homologado;280.88;280.88;280.88;280.88;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E23;Ind 1 un;homologado;198.0;217.17923076923077;198.0;383.33;13;3;
+E23;unidade;homologado;7.18;2582.4891666666667;839.3725;7900.01;6;4;
+E24;Embalagem 250 G;homologado;4.5;4.5;4.5;4.5;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+E24;unidade;homologado;3.4;6.463333333333334;5.99;10.0;3;3;
+P01;1 Un.;homologado;193.05;193.05;193.05;193.05;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;BL;homologado;17.99;17.99;17.99;17.99;5;1;
+P01;BLC;homologado;14.0;14.0;14.0;14.0;5;1;
+P01;Cx 10 Resmas;homologado;239.0;239.0;239.0;239.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;Ind 1 Resma;homologado;17.0;17.0;17.0;17.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;Ind 1 un;homologado;8.39;8.39;8.39;8.39;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;Pct. 5 Uns.;homologado;3.85;3.85;3.85;3.85;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P01;unidade;homologado;11.17;19.585;19.585;28.0;2;2;
+P02;unidade;homologado;22.0;22.9;22.9;23.8;2;2;
+P04;Caixa 24,00 UN;homologado;16.0;16.0;16.0;16.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P04;Cx 12 un;homologado;10.33;10.33;10.33;10.33;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P04;unidade;homologado;1.5;1.5;1.5;1.5;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P05;Caixa 12,00 UN;homologado;6.48;6.48;6.48;6.48;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P05;Cx 72 Un;homologado;57.0;57.0;57.0;57.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P06;CX;homologado;21.44;22.185000000000002;22.185000000000002;22.93;2;1;
+P06;Caixa 12,00 UN;homologado;16.2;16.2;16.2;16.2;3;1;
+P06;Caixa 50 UN;homologado;26.0;36.16615384615385;32.58;61.0;13;6;
+P06;Caixa 50,00 UN;homologado;16.0;32.233636363636364;35.4;39.99;11;6;
+P06;Cx 50 Un.;homologado;25.51;37.35;33.5;47.9;7;5;
+P06;Cx 50 Unds;homologado;21.77;21.91333333333333;21.77;22.2;3;1;
+P06;unidade;homologado;0.49;778.37;1.0;12433.3;16;11;
+P10;Caixa 6,00 UN;homologado;4.0;4.0;4.0;4.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P12;unidade;homologado;9.35;9.35;9.35;9.35;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P14;Ind 1 un;homologado;6.3;6.3;6.3;6.3;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P15;Caixa 1000 UN;homologado;1500.0;1500.0;1500.0;1500.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P15;unidade;homologado;0.85;1.491666666666667;1.62;1.62;6;2;
+P16;unidade;homologado;465000.0;465000.0;465000.0;465000.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
+P19;UNID.;homologado;5.89;6.945;6.945;8.0;2;2;
+P19;unidade;homologado;3.0;16.075;5.465;92.25;8;8;
+P21;unidade;homologado;83.0;83.0;83.0;83.0;1;1;atencao: baseado em 1 unico certame, nao usar como referencia robusta
