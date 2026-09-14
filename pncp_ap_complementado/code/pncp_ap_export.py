@@ -525,17 +525,36 @@ def exportar_tudo(db_path, export_dir):
         df.to_csv(caminho, index=False, sep=";", encoding="utf-8-sig")
 
     import classificador as _cm
+
+    total_contr = int(contratacoes.shape[0])
+    pag_itens_completa = int((dados["paginacao_itens"]["status_paginacao"] == "completo").sum()) if not dados["paginacao_itens"].empty else 0
+    pag_itens_pendente = total_contr - pag_itens_completa
+    itens_aceitos_n = int((itens["classificacao_status"] == "ACEITO").sum())
+    itens_aceitos_sem_resultado = int(itens_raw[(itens_raw["classificacao_status"] == "ACEITO") &
+                                                (itens_raw["resultados_status"] == "nao_consultado")].shape[0])
+    rede_pncp_disponivel = pag_itens_completa > 0  # so a paginacao real (via rede) grava status_paginacao='completo'
+
+    if rede_pncp_disponivel and pag_itens_pendente == 0:
+        obs_ambiente = ("Rede para pncp.gov.br disponivel nesta execucao: paginacao real de itens executada e "
+                        "comprovada para %d/%d contratacoes (100%%)." % (pag_itens_completa, total_contr))
+    elif rede_pncp_disponivel:
+        obs_ambiente = ("Rede para pncp.gov.br disponivel nesta execucao: paginacao real comprovada para "
+                        "%d/%d contratacoes; %d ainda pendentes (ver cobertura.csv/pendencias.csv) -- execucao "
+                        "provavelmente interrompida por orcamento de tempo, nao por falta de rede." % (
+                            pag_itens_completa, total_contr, pag_itens_pendente))
+    else:
+        obs_ambiente = ("Acesso de rede a pncp.gov.br bloqueado nesta execucao (ou nao tentado). Paginacao real "
+                        "de itens NAO executada -- base herda apenas o reprocessamento local (classificacao e "
+                        "cancelamento). Ver comando_de_retomada.")
+
     manifesto = dict(
         versao_script="8.0-corrigido",
         versao_classificacao=_cm.REGRA_CLASSIFICACAO_VERSAO,
         gerado_em=datetime.now().isoformat(),
         periodo_configurado=dict(inicio="2025-01-01", fim_desta_complementacao="2026-09-12"),
         ambiente=dict(
-            rede_pncp_disponivel=False,
-            observacao=("Acesso de rede a pncp.gov.br bloqueado pela politica de egress deste ambiente "
-                        "(403 no CONNECT, confirmado via proxy). Paginacao de itens e complementacao de "
-                        "resultados NAO puderam ser executadas contra a API real nesta sessao. Codigo "
-                        "corrigido e testado com mocks; comando de retomada no manifesto."),
+            rede_pncp_disponivel=bool(rede_pncp_disponivel),
+            observacao=obs_ambiente,
         ),
         periodo_efetivamente_coberto=dict(
             janelas_concluidas=int((dados["checkpoints"]["status"] == "concluido").sum()) if not dados["checkpoints"].empty else 0,
@@ -545,25 +564,30 @@ def exportar_tudo(db_path, export_dir):
             cobertura_publicacoes_verificada_sem_lacunas=True,
         ),
         contagens=dict(
-            contratacoes=int(contratacoes.shape[0]),
+            contratacoes=total_contr,
             contratacoes_estadual_municipal=int(contratacoes_estadual_municipal.shape[0]),
             itens=int(itens.shape[0]),
-            itens_aceitos=int((itens["classificacao_status"] == "ACEITO").sum()),
+            itens_aceitos=itens_aceitos_n,
             itens_quarentena=int((itens["classificacao_status"] == "QUARENTENA").sum()),
             itens_excluidos=int((itens["classificacao_status"] == "EXCLUIDO").sum()),
             resultados=int(resultados.shape[0]),
-            contratacoes_com_paginacao_comprovadamente_completa=int((dados["paginacao_itens"]["status_paginacao"] == "completo").sum()) if not dados["paginacao_itens"].empty else 0,
+            itens_aceitos_sem_resultado_consultado=itens_aceitos_sem_resultado,
+            contratacoes_com_paginacao_comprovadamente_completa=pag_itens_completa,
+            contratacoes_com_paginacao_pendente=pag_itens_pendente,
             contratacoes_com_suspeita_de_truncamento_alta_prioridade=int((dados["paginacao_itens"]["suspeita_truncamento"] == 1).sum()) if not dados["paginacao_itens"].empty else 0,
         ),
         comando_de_retomada=(
             "cd pncp_ap_complementado/code && "
-            "python pncp_ap_collector.py --recuperar-itens --time-budget-min 120  # prioriza as 696 contratacoes com suspeita de truncamento; "
+            "python pncp_ap_collector.py --recuperar-itens --time-budget-min 120  # prioriza as contratacoes com suspeita de truncamento; "
             "python pncp_ap_collector.py --recuperar-resultados --time-budget-min 60  # depois de recuperar itens; "
             "python pncp_ap_collector.py --export  # gera CSVs/Excel novamente apos a coleta"
-        ),
+        ) if (pag_itens_pendente > 0 or itens_aceitos_sem_resultado > 0) else "Nenhuma retomada necessaria: paginacao de itens e resultados dos itens aceitos comprovadamente completas.",
         limitacoes=[
-            "Paginacao real de itens e complementacao de resultados nao executadas nesta sessao (sem rede); "
-            "base entregue e PARCIAL quanto a completude de itens -- ver cobertura.csv e pendencias.csv.",
+            ("Paginacao real de itens e complementacao de resultados nao executadas nesta sessao (sem rede); "
+             "base entregue e PARCIAL quanto a completude de itens -- ver cobertura.csv e pendencias.csv."
+             if not rede_pncp_disponivel else
+             "Paginacao real de itens comprovadamente completa (%d/%d contratacoes); resultados coletados para "
+             "itens aceitos com %d ainda sem consulta." % (pag_itens_completa, total_contr, itens_aceitos_sem_resultado)),
             "Atas, contratos, empenhos, pagamentos e concorrentes nao sao coletados nesta versao.",
             "srp=true identifica o procedimento, nao comprova ata assinada nem consumo.",
             "CR4/HHI calculados apenas sobre o universo efetivamente coletado ate o momento da exportacao, "
